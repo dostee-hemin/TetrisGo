@@ -297,7 +297,7 @@ function duplicateGrid() {
 // These functions perferm actions or do tasks based on a tetromino
 
 // Creates a new tetromino and moves it to the best location
-function createTetromino(isScrambled) {
+function dropTetromino(isScrambled) {
   // Everytime we create a new tetromino piece, the posing timer resets
   poseTimer = maxTimer;
 
@@ -891,7 +891,7 @@ function displayGameElements() {
 
   // Display the current piece shape on the video feed
   fill(255,150);
-  drawPieceShape(currentTetrominoType, width/2 + video.width/2, video.height/2, 150);
+  drawPieceShape(currentTetrominoType, width/2 + webcam.width/2, webcam.height/2, 150);
 }
 
 
