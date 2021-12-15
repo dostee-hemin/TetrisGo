@@ -26,7 +26,8 @@ let speed = 1;                  // The dropspeed of the tetromino (in framesPerS
 let currentTetrominoType;       // An integer ID representing the shape of the current tetromino
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
 let pieceBag = [];              // The list of upcoming pieces (IDs)
-let bagCounter = 7;             // The current piece in the bag that is being used
+let bagCounter;                 // The current piece in the bag that is being used
+let startingCountdownTimer;     // Countdown timer in frames before the game begins
 
 let lineCount = 0;              // Number of lines cleared in total
 let highScoreLineCount = 0;     // Best number of line clears
@@ -67,9 +68,23 @@ function setupTetrisPart() {
   // Add 7 pieces in the piece bag
   // (each element will be the piece shape ID equal to its index in the list)
   for(let i=0; i<7; i++) pieceBag[i] = i;
+  bagCounter = pieceBag.length;
 
   // Create an empty 2D tetromino (each box of the tetromino will have an x and y value)
   for (let i = 0; i < 4; i++) currentTetromino[i] = [];
+
+  // If the score beats the highscore, then save the record values
+  if(score > highScore) {
+    highScore = score;
+    highScoreLineCount = lineCount;
+  }
+
+  // Reset these values for the next game
+  score = 0;
+  lineCount = 0;
+
+  // Set the countdown timer
+  startingCountdownTimer = 240;
 
   // Generate the next tetromino
   newTrominio();
@@ -179,27 +194,9 @@ function moveSideways(dir, tetromino) {
 
 
 /*-------------------- Grid Functions -------------------*/
-// These functions control the grid's behavior, like resetting and clearing lines
-function reset() {
-  // Empty the grid (i.e. remove all blocks)
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      grid[i][j] = 0;
-    }
-  }
-
-  // If the score beats the highscore, then save the record values
-  if(score > highScore) {
-    highScore = score;
-    highScoreLineCount = lineCount;
-  }
-
-  // Reset these values for the next game
-  score = 0;
-  lineCount = 0;
-
-  // Create the next tetromino
-  newTrominio();
+// These functions control the grid's behavior
+function endGame() {
+  gameState = 2;
 }
 
 function checkLines() {
@@ -306,11 +303,11 @@ function dropTetromino(isScrambled) {
   // If the piece should not be scrambled, create an ordinary tetromino from the piece type
   else createTetrominoFromType();
 
-  // If the new generated tetromino is created on the stack, we have topped out, so reset the game.
-  if (landsOnStack(currentTetromino)) reset();
-
   findOptimumPiecePlacement();
   moveTetrominoToOptimumPosition();
+
+  // If the new generated tetromino is created on the stack, we have topped out, so reset the game.
+  if (landsOnStack(currentTetromino)) endGame();
 }
 
 // Returns true if the given tetromino overlaps with any block on the stack
@@ -363,6 +360,10 @@ function duplicateTetromino(tetromino) {
 
 
 function placePiece() {
+  if(outOfBounds(currentTetromino)) {
+    endGame();
+    return;
+  }
   // Set the grid to solid blocks at the location of the current tetromino.
   // The type/color of the solid block will be based on the tetromino type
   for (let i = 0; i < 4; i++) {
@@ -850,6 +851,8 @@ function drawPieceShape(pieceType, centerX, centerY, blockSize) {
 
 // Displays every tetris element like it was in the draw function
 function displayGameElements() {
+  push();
+  translate(100,50);
   // Display all elements in the grid
   noStroke();
   rectMode(CORNER);
@@ -866,15 +869,6 @@ function displayGameElements() {
     rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
   }
 
-  // Display the score and line count text, with their record values
-  fill(0);
-  textSize(30);
-  text("Score = " + score, 100, 20 * scl + 50);
-  text("Line Count = " + lineCount, 100, 20*scl + 100);
-  text("Best score = " + highScore, 100, 20 * scl + 150);
-  text("Best lines = " + highScoreLineCount, 100, 20 * scl + 200);
-
-
   // Display the board that contains the piece bag contents
   fill(200);
   stroke(150);
@@ -886,12 +880,23 @@ function displayGameElements() {
   noStroke();
   for(let i=bagCounter-1; i<pieceBag.length; i++) {
     colorFromType(pieceBag[i]+1);
-    drawPieceShape(pieceBag[i], scl*cols + 70, 35+i*85, 24);
+    drawPieceShape(pieceBag[i], scl*cols + 70, 40+i*85, 24);
   }
+
+  // Display the score and line count text, with their record values
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("Score = " + score, cols/10*scl, rows*scl + 40);
+  text("Line Count = " + lineCount, cols/10*scl, rows*scl + 90);
+  text("Best score = " + highScore, (cols-cols/10)*scl, rows*scl + 40);
+  text("Best lines = " + highScoreLineCount, (cols-cols/10)*scl, rows*scl + 90);
+  pop();
 
   // Display the current piece shape on the video feed
   fill(255,150);
-  drawPieceShape(currentTetrominoType, width/2 + webcam.width/2, webcam.height/2, 150);
+  noStroke();
+  drawPieceShape(currentTetrominoType, width/2 + webcam.width/2, height/2, 150);
 }
 
 

@@ -15,13 +15,17 @@
 /*-------------------- Variables -------------------*/
 
 // URL of the posenet model
-const URL = "https://teachablemachine.withgoogle.com/models/UDei8T-wa/";
+//const URL = "https://teachablemachine.withgoogle.com/models/UDei8T-wa/";          // Version 1 (basic piece poses and "Nothing")
+const URL = "https://teachablemachine.withgoogle.com/models/rdqmqZekC/";          // Version 2 (piece poses and camera adjustment)
 let model;      // The posenet model that converts an image to an ID of a pose
 let webcam;     // The HTML element that recieves video input from the webcam
 
 // The label of the model's prediction 
 // (by default it's set to waiting until the model comes online)
 let label = "waiting";
+
+// This array contains all the possible pose labels that could come out of the model
+let allLabels = ["O", "I", "T", "S", "Z", "L", "J", "Just Right", "Too Close", "Too Far", "Too High", "Too Low", "Anybody there?"];
 
 
 
@@ -92,32 +96,39 @@ async function predict() {
 // These functions contribute to the drawing of the pose detection in any way possible.
 // If it controls color, shape, or text, it lies in this area.
 function displayPoseElements() {
+    push();
+    translate(width/2,height/2);
     // Draw the posing timer as a bar that's shrinking in length
     // The red fill in side the bar
     fill(255,0,0);
     noStroke();
     rectMode(CORNER);
-    rect(width/2,webcam.height+100,(float(poseTimer)/maxTimer) * webcam.width - 10, 50);
+    rect(0,-webcam.height/2-60,(float(poseTimer)/maxTimer) * webcam.width, 50);
 
     // The outline of the bar
     stroke(0);
     noFill();
     strokeWeight(3);
-    rect(width/2,webcam.height+100, webcam.width - 10, 50);
+    rect(0,-webcam.height/2-60, webcam.width, 50);
     rectMode(CENTER);
     
     // If there is a webcam feed available, draw it on the right side of the screen
     if(webcam.canvas) {
         push();
-        translate(width/2,0);
+        translate(0,-webcam.height/2);
         let ctx = canvas.getContext("2d");
         ctx.drawImage(webcam.canvas, 0, 0);
         pop();
     }
     
-    // Display the current label the model
-    textAlign(CENTER);
-    fill(0);
-    textSize(60);
-    text(label, width/2+webcam.width/2, webcam.height+50);
+    // Get the index in the allLabels array that the current prediction is located
+    let indexOfLabel = allLabels.indexOf(label);
+    // Display the current label of the model only if it is a piece
+    if(indexOfLabel < 7 && indexOfLabel > -1) {
+        // Display the label as a piece
+        colorFromType(indexOfLabel+1);
+        noStroke();
+        drawPieceShape(indexOfLabel, webcam.width/2, webcam.height/2+50, 28);
+    }
+    pop();
 }
