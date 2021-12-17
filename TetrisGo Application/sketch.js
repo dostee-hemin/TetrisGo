@@ -1,7 +1,7 @@
 // This variable determines which scenario in the application we are in. It helps in scene navigation
 let gameState = 0;
 
-async function setup() {
+async function setup() {  
   createCanvas(1300, 800);
 
   // Call the setup function for the pose detection part of the application
@@ -61,7 +61,9 @@ function keyPressed() {
       break;
     case 3:
       // In the adjust camera panel, if the user presses the enter key, start the tetris game
-      if(keyCode == RETURN) gameState = 1;
+      if(keyCode == RETURN) {
+        gameState = 1;
+      }
       break;
   }
 }
@@ -144,7 +146,11 @@ function gameScene() {
       textAlign(CENTER);
       text(txts[int(startingCountdownTimer/60)], width/2, height/2);
 
-      startingCountdownTimer-=1.5;
+      if(startingCountdownTimer % 60 == 0) {
+        if(startingCountdownTimer < 120) goSound.play();
+        else playSound(countdownSound);
+      }
+      startingCountdownTimer--;
       return;
     }  
   } else {
@@ -173,10 +179,15 @@ function gameScene() {
     text("Press 'r' to restart", width/2, height/2+350);
     return;
   }
+
+  if(startingCountdownTimer > -10) {
+    themeSong.play();
+    startingCountdownTimer -20;
+  }
   
   
   // If the model is loaded and we need to make a prediction, make the prediction
-  if(model != null && isWaitingForPlayer) predict();
+  if(isWaitingForPlayer) predict();
 
 
 
@@ -184,13 +195,14 @@ function gameScene() {
   /*----------------- Tetris Part ----------------*/
 
   // If the model is loaded and we need to make a prediction, create a tetromino based on the pose
-  if(model != null && isWaitingForPlayer) {
+  if(isWaitingForPlayer) {
     // If the model's predicted pose matches the current tetromino type,
     //  that means the player has correctly performed the pose, so drop the next tetromino
     if(allLabels.indexOf(label) == currentTetrominoType) {
       // Drop an ordinary tetromino
       dropTetromino(false);
       isWaitingForPlayer = false;
+      playSound(correctSound);
     }
 
     // While we are waiting for the player to get into the correct pose,
@@ -202,6 +214,7 @@ function gameScene() {
       // Drop a scrambled tetromino
       dropTetromino(true);
       isWaitingForPlayer = false;
+      playSound(wrongSound);
     }
   }
 

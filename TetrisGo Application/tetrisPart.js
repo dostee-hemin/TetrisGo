@@ -197,6 +197,8 @@ function moveSideways(dir, tetromino) {
 // These functions control the grid's behavior
 function endGame() {
   gameState = 2;
+  resetSound(themeSong);
+  playSound(gameoverSound);
 }
 
 function checkLines() {
@@ -228,6 +230,10 @@ function checkLines() {
       numberOfClears++;
     }
   }
+
+  // Play the correct sound based on the number of lines cleared
+  if(numberOfClears == 4) playSound(tetrisSound);
+  else if(numberOfClears > 0) playSound(lineclearSound);
 
   // Based on the number of lines cleared, increase the score
   switch(numberOfClears) {
