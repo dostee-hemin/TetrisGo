@@ -26,6 +26,7 @@ let speed = 1;                  // The dropspeed of the tetromino (in framesPerS
 let currentTetrominoType;       // An integer ID representing the shape of the current tetromino
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
 let pieceBag = [];              // The list of upcoming pieces (IDs)
+let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
 let bagCounter;                 // The current piece in the bag that is being used
 let startingCountdownTimer;     // Countdown timer in frames before the game begins
 
@@ -41,7 +42,7 @@ let optimumRotation = -1;           // The optimum rotation for the current piec
 let lowestPlacementCost = 10000;    // The lowest cost of the current piece placement
 let optimumRight = -1;              // The optimum distance from the left side of the board for the current piece
 
-let isWaitingForPlayer = false;     // Determines whether or not the game is waiting for the player to get into the right pose
+let canDropPiece = true;           // Determines whether or not the upcoming piece can be dropped (because another piece might be dropping)
 let maxTimer = 100;                 // The maximum number of frames allowed for creating the correct pose
 let poseTimer = maxTimer;           // The current amount of frames remaining for creating the correct pose
 
@@ -86,8 +87,8 @@ function setupTetrisPart() {
   // Set the countdown timer
   startingCountdownTimer = 240;
 
-  // Generate the next tetromino
-  newTrominio();
+  // Get the first piece in the bag
+  nextTetromino();
 }
 
 
@@ -300,14 +301,14 @@ function duplicateGrid() {
 // These functions perferm actions or do tasks based on a tetromino
 
 // Creates a new tetromino and moves it to the best location
-function dropTetromino(isScrambled) {
+function dropTetromino(type, isScrambled) {
   // Everytime we create a new tetromino piece, the posing timer resets
   poseTimer = maxTimer;
 
   // If the piece should be scrambled, create 4 random boxes for the tetromino
   if(isScrambled) createScrambledTetromino();
   // If the piece should not be scrambled, create an ordinary tetromino from the piece type
-  else createTetrominoFromType();
+  else createTetrominoFromType(type);
 
   findOptimumPiecePlacement();
   moveTetrominoToOptimumPosition();
@@ -366,28 +367,22 @@ function duplicateTetromino(tetromino) {
 
 
 function placePiece() {
-  if(outOfBounds(currentTetromino)) {
-    endGame();
-    return;
-  }
   // Set the grid to solid blocks at the location of the current tetromino.
   // The type/color of the solid block will be based on the tetromino type
   for (let i = 0; i < 4; i++) {
-    grid[currentTetromino[i][0]][currentTetromino[i][1]] = currentTetrominoType + 1;
+    grid[currentTetromino[i][0]][currentTetromino[i][1]] = (upcomingPieces[0]%7)+1;
   }
 
   // Check lines for clearing
   checkLines();
 
-  // Create a new tetromino piece
-  newTrominio();
+  // Move on to the next upcoming piece
+  upcomingPieces.shift();
+  canDropPiece = true;
 }
 
-// Creates a new tetromino from the next piece in the piece bag
-function newTrominio() {
-  // Move all the blocks of the tetromino out of bounds (just to prevent it from being seen)
-  for (let i = 0; i < 4; i++) currentTetromino[i] = [-10,-10];
-
+// Moves on to the next tetromino in the piece bag
+function nextTetromino() {
   // If we have run out of new pieces to get from the bag counter, 
   // reshuffle the array and start from the first piece again
   if(bagCounter == pieceBag.length) {
@@ -400,9 +395,6 @@ function newTrominio() {
 
   // Move on to the next piece for the next time we create a new tetromino
   bagCounter++;
-
-  // The program will start waiting for the player to get into the correct pose before dropping the current piece
-  isWaitingForPlayer = true;
 }
 
 
@@ -427,9 +419,9 @@ function createScrambledTetromino() {
   maximumNumberOfRotations = 4;
 }
 
-function createTetrominoFromType() {
+function createTetrominoFromType(type) {
   // Based on the type of the piece, generate the tetromino
-  switch (currentTetrominoType) {
+  switch (type) {
     // O piece
     case 0:
       currentTetromino[0][0] = 4;
@@ -869,10 +861,12 @@ function displayGameElements() {
     }
   }
 
-  // Display the current tetromino
-  for (let i = 0; i < 4; i++) {
-    colorFromType(currentTetrominoType + 1);
-    rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
+  // Display the current tetromino only if it is currently being dropped
+  if(!canDropPiece) {
+    for (let i = 0; i < 4; i++) {
+      colorFromType((upcomingPieces[0]%7)+1);
+      rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
+    }
   }
 
   // Display the board that contains the piece bag contents

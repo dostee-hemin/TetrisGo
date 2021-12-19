@@ -46,28 +46,6 @@ function mainMenu() {
   }
 }
 
-function keyPressed() {
-  switch(gameState) {
-    case 0:
-      // In the main menu, if the user presses the enter key, move on to adjusting the camera
-      if(keyCode == RETURN) gameState = 3;
-      break;
-    case 2:
-      // In the game over scene, if the user presses the r key, reset the game
-      if(key == 'r') {
-        setupTetrisPart();
-        gameState = 1;
-      }
-      break;
-    case 3:
-      // In the adjust camera panel, if the user presses the enter key, start the tetris game
-      if(keyCode == RETURN) {
-        gameState = 1;
-      }
-      break;
-  }
-}
-
 function adjustCamera() {
   // Update the webcam frame
   webcam.update();
@@ -146,10 +124,13 @@ function gameScene() {
       textAlign(CENTER);
       text(txts[int(startingCountdownTimer/60)], width/2, height/2);
 
+      // Everytime the countdown timer loses a second (i.e. 60 frames), play a sound
       if(startingCountdownTimer % 60 == 0) {
         if(startingCountdownTimer < 120) goSound.play();
         else playSound(countdownSound);
       }
+
+      // Decrement the frames remaining in the timer
       startingCountdownTimer--;
       return;
     }  
@@ -180,44 +161,71 @@ function gameScene() {
     return;
   }
 
+  // Once the countdown timer finishes, play the theme song
   if(startingCountdownTimer > -10) {
     themeSong.play();
     startingCountdownTimer -20;
   }
   
   
-  // If the model is loaded and we need to make a prediction, make the prediction
-  if(isWaitingForPlayer) predict();
+  // Make the model predict what pose the player is currently in
+  predict();
 
 
 
 
   /*----------------- Tetris Part ----------------*/
 
-  // If the model is loaded and we need to make a prediction, create a tetromino based on the pose
-  if(isWaitingForPlayer) {
-    // If the model's predicted pose matches the current tetromino type,
-    //  that means the player has correctly performed the pose, so drop the next tetromino
-    if(allLabels.indexOf(label) == currentTetrominoType) {
-      // Drop an ordinary tetromino
-      dropTetromino(false);
-      isWaitingForPlayer = false;
-      playSound(correctSound);
-    }
-
-    // While we are waiting for the player to get into the correct pose,
-    // decrease the amount of frames left for posing
-    poseTimer--;
-    
-    // If we have run out of frames for posing, drop the tetromino but scrambled
-    if(poseTimer == 0) {
-      // Drop a scrambled tetromino
-      dropTetromino(true);
-      isWaitingForPlayer = false;
-      playSound(wrongSound);
-    }
+  // If the model's predicted pose matches the current tetromino type,
+  // that means the player has correctly performed the pose, so drop the next tetromino
+  if(allLabels.indexOf(label) == currentTetrominoType) {
+    // Drop an ordinary tetromino
+    upcomingPieces.push(currentTetrominoType);
+    nextTetromino();
+    playSound(correctSound);
   }
 
-  // After a certain amount of frames, move down
-  if (frameCount % speed == 0 && !isWaitingForPlayer) currentTetromino = moveDown(currentTetromino);
+  // While we are waiting for the player to get into the correct pose,
+  // decrease the amount of frames left for posing
+  poseTimer--;
+    
+  // If we have run out of time for posing, drop the tetromino but scrambled
+  if(poseTimer == 0) {
+    // Drop a scrambled tetromino
+    upcomingPieces.push(currentTetrominoType+7);
+    nextTetromino();
+    playSound(wrongSound);
+  }
+
+  // If there are pieces ready to drop, drop the first one and wait for it to finish before dropping again
+  if(upcomingPieces.length != 0 && canDropPiece) {
+    // Drop the current piece with a given type and whether or not to scramble
+    dropTetromino(upcomingPieces[0]%7,(upcomingPieces[0]>6));
+    canDropPiece = false;
+  }
+
+  // After a certain amount of frames, move the current piece down
+  if (frameCount % speed == 0 && !canDropPiece) currentTetromino = moveDown(currentTetromino);
+}
+
+function keyPressed() {
+  switch(gameState) {
+    case 0:
+      // In the main menu, if the user presses the enter key, move on to adjusting the camera
+      if(keyCode == RETURN) gameState = 3;
+      break;
+    case 2:
+      // In the game over scene, if the user presses the r key, reset the game
+      if(key == 'r') {
+        setupTetrisPart();
+        gameState = 1;
+      }
+      break;
+    case 3:
+      // In the adjust camera panel, if the user presses the enter key, start the tetris game
+      if(keyCode == RETURN) {
+        gameState = 1;
+      }
+      break;
+  }
 }
