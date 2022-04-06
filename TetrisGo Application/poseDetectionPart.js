@@ -98,19 +98,6 @@ async function predict() {
 function displayPoseElements() {
     push();
     translate(width/2,height/2);
-    // Draw the posing timer as a bar that's shrinking in length
-    // The red fill in side the bar
-    fill(255,0,0);
-    noStroke();
-    rectMode(CORNER);
-    rect(0,-webcam.height/2-60,(float(poseTimer)/maxTimer) * webcam.width, 50);
-
-    // The outline of the bar
-    stroke(0);
-    noFill();
-    strokeWeight(3);
-    rect(0,-webcam.height/2-60, webcam.width, 50);
-    rectMode(CENTER);
     
     // If there is a webcam feed available, draw it on the right side of the screen
     if(webcam.canvas) {

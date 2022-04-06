@@ -25,10 +25,15 @@ let scl = 30;                   // The size of each cell/box (in pixels)
 let speed = 1;                  // The dropspeed of the tetromino (in framesPerSecond)
 let currentTetrominoType;       // An integer ID representing the shape of the current tetromino
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
-let pieceBag = [];              // The list of upcoming pieces (IDs)
-let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
-let bagCounter;                 // The current piece in the bag that is being used
 let startingCountdownTimer;     // Countdown timer in frames before the game begins
+let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
+let allPieces = [];
+let effectsTxt;
+let acceptanceAmount = 100;     // Amount in pixels that the piece has to be near the end before being accepted as a correct pose
+let startSecond;                // Represents the exact second the player started playing the game
+let poseTime = 2;               // Time (in seconds) give to the player to pose a given piece
+let scalingFactor = scl*rows/poseTime;    // pixels per second
+let startDelay = 2;             // Amount of time (in seconds) before the music starts
 
 let lineCount = 0;              // Number of lines cleared in total
 let highScoreLineCount = 0;     // Best number of line clears
@@ -43,10 +48,6 @@ let lowestPlacementCost = 10000;    // The lowest cost of the current piece plac
 let optimumRight = -1;              // The optimum distance from the left side of the board for the current piece
 
 let canDropPiece = true;           // Determines whether or not the upcoming piece can be dropped (because another piece might be dropping)
-let maxTimer = 100;                 // The maximum number of frames allowed for creating the correct pose
-let poseTimer = maxTimer;           // The current amount of frames remaining for creating the correct pose
-
-
 
 
 
@@ -66,11 +67,6 @@ function setupTetrisPart() {
     }
   }
 
-  // Add 7 pieces in the piece bag
-  // (each element will be the piece shape ID equal to its index in the list)
-  for(let i=0; i<7; i++) pieceBag[i] = i;
-  bagCounter = pieceBag.length;
-
   // Create an empty 2D tetromino (each box of the tetromino will have an x and y value)
   for (let i = 0; i < 4; i++) currentTetromino[i] = [];
 
@@ -86,9 +82,6 @@ function setupTetrisPart() {
 
   // Set the countdown timer
   startingCountdownTimer = 240;
-
-  // Get the first piece in the bag
-  nextTetromino();
 }
 
 
@@ -254,13 +247,6 @@ function checkLines() {
 
   // Increase the linecount
   lineCount += numberOfClears;
-
-  // Increase the speed of the posing timer based on the number of lines cleared.
-  // More lines cleared will mean a faster increase in speed.
-  maxTimer -= 5*numberOfClears;
-
-  // Constrain the posing timer so it doesn't get too fast
-  if(maxTimer < 30) maxTimer = 30;
 }
 
 function duplicateGrid() {
@@ -302,9 +288,6 @@ function duplicateGrid() {
 
 // Creates a new tetromino and moves it to the best location
 function dropTetromino(type, isScrambled) {
-  // Everytime we create a new tetromino piece, the posing timer resets
-  poseTimer = maxTimer;
-
   // If the piece should be scrambled, create 4 random boxes for the tetromino
   if(isScrambled) createScrambledTetromino();
   // If the piece should not be scrambled, create an ordinary tetromino from the piece type
@@ -379,22 +362,6 @@ function placePiece() {
   // Move on to the next upcoming piece
   upcomingPieces.shift();
   canDropPiece = true;
-}
-
-// Moves on to the next tetromino in the piece bag
-function nextTetromino() {
-  // If we have run out of new pieces to get from the bag counter, 
-  // reshuffle the array and start from the first piece again
-  if(bagCounter == pieceBag.length) {
-    bagCounter = 0;
-    shuffleArray(pieceBag);
-  }
-
-  // Set the current tetromino type to be the current piece of the bag
-  currentTetrominoType = pieceBag[bagCounter];
-
-  // Move on to the next piece for the next time we create a new tetromino
-  bagCounter++;
 }
 
 
@@ -869,18 +836,26 @@ function displayGameElements() {
     }
   }
 
-  // Display the board that contains the piece bag contents
+  // Display the board that contains the upcoming pieces
   fill(200);
   stroke(150);
   strokeWeight(4);
   rectMode(CENTER);
   rect(scl*cols + 70, scl*(rows/2),100, scl*rows);
 
-  // Display all the upcoming pieces in the piece bag
+  // Period in the board for accepting correct poses
+  fill(0,255,255,100);
   noStroke();
-  for(let i=bagCounter-1; i<pieceBag.length; i++) {
-    colorFromType(pieceBag[i]+1);
-    drawPieceShape(pieceBag[i], scl*cols + 70, 40+i*85, 24);
+  rect(scl*cols+70, acceptanceAmount/2, 100, acceptanceAmount);
+
+  // Display the upcoming pieces
+  noStroke();
+  for(let i=0; i<allPieces.length; i++) {
+    var y = acceptanceAmount/2 + (allPieces[i][0]+startSecond+startDelay-millis()/1000) * scalingFactor;
+    if(y > scl*rows - 40) continue;
+
+    colorFromType(allPieces[i][1]+1);
+    drawPieceShape(allPieces[i][1], scl*cols+70, y, 24);
   }
 
   // Display the score and line count text, with their record values

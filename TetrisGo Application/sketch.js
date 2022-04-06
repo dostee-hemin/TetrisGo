@@ -1,6 +1,15 @@
 // This variable determines which scenario in the application we are in. It helps in scene navigation
 let gameState = 0;
 
+function createEffects() {
+  for(let i=0; i<effectsTxt.length; i++) {
+    allPieces[i] = split(effectsTxt[i], " ");
+    allPieces[i][0] = float(allPieces[i][0]);
+    allPieces[i][1] = int(allPieces[i][1]);
+  }
+  console.log(allPieces);
+}
+
 async function setup() {  
   createCanvas(1300, 800);
 
@@ -9,6 +18,8 @@ async function setup() {
 
   // Call the setup function for the tetris part of the application
   setupTetrisPart();
+
+  effectsTxt = loadStrings('effects.txt', createEffects);
 }
 
 function draw() {
@@ -162,10 +173,12 @@ function gameScene() {
   }
 
   // Once the countdown timer finishes, play the theme song
-  if(startingCountdownTimer > -10) {
-    themeSong.play();
-    startingCountdownTimer -20;
+  if(startingCountdownTimer > -10 && startingCountdownTimer != 20) {
+    startingCountdownTimer = -20;
+    startSecond = millis()/1000;
   }
+
+  if(millis()/1000 > startSecond + startDelay) themeSong.play();
   
   
   // Make the model predict what pose the player is currently in
@@ -178,23 +191,30 @@ function gameScene() {
 
   // If the model's predicted pose matches the current tetromino type,
   // that means the player has correctly performed the pose, so drop the next tetromino
-  if(allLabels.indexOf(label) == currentTetrominoType) {
-    // Drop an ordinary tetromino
-    upcomingPieces.push(currentTetrominoType);
-    nextTetromino();
-    playSound(correctSound);
+  let closestUpcomingPiece;
+  for(var i=0; i<allPieces.length; i++) {
+    currentTime = millis()/1000 - 0.5;
+    if(currentTime < allPieces[i][0]+startDelay+startSecond) {
+      currentTetrominoType = allPieces[i][1];
+      closestUpcomingPiece = allPieces[i];
+      break;
+    }
   }
 
-  // While we are waiting for the player to get into the correct pose,
-  // decrease the amount of frames left for posing
-  poseTimer--;
-    
+  var y = acceptanceAmount/2+(closestUpcomingPiece[0]+startSecond+startDelay-millis()/1000) * scalingFactor;
   // If we have run out of time for posing, drop the tetromino but scrambled
-  if(poseTimer == 0) {
+  if(y < 0) {
     // Drop a scrambled tetromino
     upcomingPieces.push(currentTetrominoType+7);
-    nextTetromino();
     playSound(wrongSound);
+    allPieces.shift();
+  } else if(y < acceptanceAmount) {
+    if(allLabels.indexOf(label) == currentTetrominoType) {
+      // Drop an ordinary tetromino
+      upcomingPieces.push(currentTetrominoType);
+      playSound(correctSound);
+      allPieces.shift();
+    }
   }
 
   // If there are pieces ready to drop, drop the first one and wait for it to finish before dropping again
