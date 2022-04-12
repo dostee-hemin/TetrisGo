@@ -2,23 +2,23 @@
 let gameState = 0;
 
 function createEffects() {
+  // Load the effects text file and store the time and pose of each effect
   for(let i=0; i<effectsTxt.length; i++) {
-    allPieces[i] = split(effectsTxt[i], " ");
-    allPieces[i][0] = float(allPieces[i][0]);
-    allPieces[i][1] = int(allPieces[i][1]);
+    let elements = split(effectsTxt[i], " ");
+    mappedPieces[i] = {time: float(elements[0]), type: int(elements[1])};
   }
-  console.log(allPieces);
+  console.log(mappedPieces);
 }
-
+  
 async function setup() {  
   createCanvas(1300, 800);
-
+    
   // Call the setup function for the pose detection part of the application
   setupPoseDetectionPart();
 
   // Call the setup function for the tetris part of the application
   setupTetrisPart();
-
+  
   effectsTxt = loadStrings('effects.txt', createEffects);
 }
 
@@ -50,7 +50,7 @@ function mainMenu() {
   textAlign(CENTER);
   if(int(frameCount/30)%2 == 0) {
     // If the model is not yet loaded, display a "waiting" text
-    if(model == null) text("Waiting for model to load...", width/2, height/2);
+    if(armPoints == null) text("Waiting for model to load...", width/2, height/2);
 
     // If the model is loaded, display a "press start" text
     else text("Press start!", width/2, height/2);
@@ -58,23 +58,31 @@ function mainMenu() {
 }
 
 function adjustCamera() {
-  // Update the webcam frame
-  webcam.update();
-
-  // Make the model predict what pose the user is currently doing
-  predict();
-
   // Set a solid background color
   background(0,40,120);
+  
+  // Draw the webcam feed in the middle of the screen
+  push();
+  translate(width/2-video.width/2+video.width,height/2-video.height/2-50);
+  scale(-1,1);
+  image(video, 0, 0);
+  pop();
 
-  // If there is a webcam feed available, draw it in the middle of the screen
-  if(webcam.canvas) {
-    push();
-    translate(width/2-webcam.width/2,height/2-webcam.height/2-50);
-    let ctx = canvas.getContext("2d");
-    ctx.drawImage(webcam.canvas, 0, 0);
-    pop();
+  if(armPoints != null) {
+    stroke(255,0,0);
+    strokeWeight(4);
+    for(let i=0; i<armPoints.length-1; i++) {
+      // Get the current keypoint and the next keypoint
+      let p1 = createVector(armPoints[i].x,armPoints[i].y);
+      let p2 = createVector(armPoints[i+1].x,armPoints[i+1].y);
+
+      // Draw a line between the two keypoints
+      line(p1.x+(width-video.width)/2,p1.y+(height-video.height)/2-50,p2.x+(width-video.width)/2,p2.y+(height-video.height)/2-50);
+      if(i==1)i++;
+    }
   }
+  
+  noStroke();
 
   // Title of page
   fill(255);
@@ -87,12 +95,12 @@ function adjustCamera() {
   if(indexOfLabel < 7 && indexOfLabel > -1) {
     colorFromType(indexOfLabel+1);
     noStroke();
-    drawPieceShape(indexOfLabel, width/2, height/2+webcam.height/2+30, 28);
+    drawPieceShape(indexOfLabel, width/2, height/2+video.height/2+30, 28);
   } 
   // Display the current label as text
   else {
     textSize(60);
-    text(label, width/2, height/2+webcam.height/2+30);
+    text(label, width/2, height/2+video.height/2+30);
   }
 
   // Display instructions for confirming the camera position
@@ -102,9 +110,6 @@ function adjustCamera() {
 }
 
 function gameScene() {
-  // Update the webcam frame
-  webcam.update();
-
   // Draw a gradient background
   for(let y=0; y<height; y++) {
     stroke(0,map(y,0,height,0,255),255);
@@ -141,6 +146,7 @@ function gameScene() {
         else playSound(countdownSound);
       }
 
+      
       // Decrement the frames remaining in the timer
       startingCountdownTimer--;
       return;
@@ -179,41 +185,29 @@ function gameScene() {
   }
 
   if(millis()/1000 > startSecond + startDelay) themeSong.play();
-  
-  
-  // Make the model predict what pose the player is currently in
-  predict();
-
 
 
 
   /*----------------- Tetris Part ----------------*/
 
-  // If the model's predicted pose matches the current tetromino type,
-  // that means the player has correctly performed the pose, so drop the next tetromino
-  let closestUpcomingPiece;
-  for(var i=0; i<allPieces.length; i++) {
-    currentTime = millis()/1000 - 0.5;
-    if(currentTime < allPieces[i][0]+startDelay+startSecond) {
-      currentTetrominoType = allPieces[i][1];
-      closestUpcomingPiece = allPieces[i];
-      break;
-    }
-  }
+  // Set the current tetromino type to the next piece that's coming in the song
+  currentTetrominoType = mappedPieces[0].type;
 
-  var y = acceptanceAmount/2+(closestUpcomingPiece[0]+startSecond+startDelay-millis()/1000) * scalingFactor;
-  // If we have run out of time for posing, drop the tetromino but scrambled
-  if(y < 0) {
-    // Drop a scrambled tetromino
+  // Calculate the y position of the piece in the track
+  var y = acceptanceAmount/2+(mappedPieces[0].time+startSecond+startDelay-millis()/1000) * scalingFactor;
+  
+  // If the player couldn't pose in time, drop a scrambled tetromino
+  if (y < 0) {
     upcomingPieces.push(currentTetrominoType+7);
     playSound(wrongSound);
-    allPieces.shift();
-  } else if(y < acceptanceAmount) {
+    mappedPieces.shift();
+  } 
+  // If the player did do the correct pose in the allowed amount of time, drop an ordinary tetromino
+  else if(y < acceptanceAmount) {
     if(allLabels.indexOf(label) == currentTetrominoType) {
-      // Drop an ordinary tetromino
       upcomingPieces.push(currentTetrominoType);
       playSound(correctSound);
-      allPieces.shift();
+      mappedPieces.shift();
     }
   }
 

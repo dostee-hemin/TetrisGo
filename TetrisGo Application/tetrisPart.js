@@ -27,12 +27,12 @@ let currentTetrominoType;       // An integer ID representing the shape of the c
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
 let startingCountdownTimer;     // Countdown timer in frames before the game begins
 let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
-let allPieces = [];
-let effectsTxt;
-let acceptanceAmount = 100;     // Amount in pixels that the piece has to be near the end before being accepted as a correct pose
+let mappedPieces = [];          // Contains the list of pieces that have been mapped to the current song
+let effectsTxt;                 // The text file that stores the information about the mapped pieces
+let acceptanceAmount = 150;     // Amount in pixels that the piece has to be near the end before being accepted as a correct pose
 let startSecond;                // Represents the exact second the player started playing the game
 let poseTime = 2;               // Time (in seconds) give to the player to pose a given piece
-let scalingFactor = scl*rows/poseTime;    // pixels per second
+let scalingFactor = scl*rows/poseTime;    // Converts seconds of the song to pixels in the screen
 let startDelay = 2;             // Amount of time (in seconds) before the music starts
 
 let lineCount = 0;              // Number of lines cleared in total
@@ -56,6 +56,9 @@ let canDropPiece = true;           // Determines whether or not the upcoming pie
 
 
 
+
+
+
 /*-------------------- Setup -------------------*/
 // This function sets up the tetris part of the application before running
 function setupTetrisPart() {
@@ -66,7 +69,7 @@ function setupTetrisPart() {
       grid[i][j] = 0;
     }
   }
-
+  
   // Create an empty 2D tetromino (each box of the tetromino will have an x and y value)
   for (let i = 0; i < 4; i++) currentTetromino[i] = [];
 
@@ -363,6 +366,7 @@ function placePiece() {
   upcomingPieces.shift();
   canDropPiece = true;
 }
+
 
 
 function createScrambledTetromino() {
@@ -837,8 +841,8 @@ function displayGameElements() {
   }
 
   // Display the board that contains the upcoming pieces
-  fill(200);
-  stroke(150);
+  fill(50);
+  stroke(25);
   strokeWeight(4);
   rectMode(CENTER);
   rect(scl*cols + 70, scl*(rows/2),100, scl*rows);
@@ -850,14 +854,14 @@ function displayGameElements() {
 
   // Display the upcoming pieces
   noStroke();
-  for(let i=0; i<allPieces.length; i++) {
-    var y = acceptanceAmount/2 + (allPieces[i][0]+startSecond+startDelay-millis()/1000) * scalingFactor;
+  for(let i=0; i<mappedPieces.length; i++) {
+    var y = acceptanceAmount/2 + (mappedPieces[i].time+startSecond+startDelay-millis()/1000) * scalingFactor;
     if(y > scl*rows - 40) continue;
 
-    colorFromType(allPieces[i][1]+1);
-    drawPieceShape(allPieces[i][1], scl*cols+70, y, 24);
+    colorFromType(mappedPieces[i].type+1);
+    drawPieceShape(mappedPieces[i].type, scl*cols+70, y, 24);
   }
-
+  
   // Display the score and line count text, with their record values
   fill(0);
   textSize(30);
@@ -871,7 +875,7 @@ function displayGameElements() {
   // Display the current piece shape on the video feed
   fill(255,150);
   noStroke();
-  drawPieceShape(currentTetrominoType, width/2 + webcam.width/2, height/2, 150);
+  drawPieceShape(currentTetrominoType, width/2 + video.width/2, height/2, 150);
 }
 
 
