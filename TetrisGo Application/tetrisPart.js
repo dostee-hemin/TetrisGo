@@ -6,6 +6,7 @@
   Tetromino Functions     (operations on a tetromino)
   Placement Algorithm     (figures out the best place to put the current piece)
   Drawing Functions       (draws the elements of the tetris game)
+  Update Functions        (updates the elements of the tetris game every frame)
   Miscellaneous Functions (performs various non-tetris-specific functions)
 */
 
@@ -25,12 +26,16 @@ let scl = 30;                   // The size of each cell/box (in pixels)
 let speed = 1;                  // The dropspeed of the tetromino (in framesPerSecond)
 let currentTetrominoType;       // An integer ID representing the shape of the current tetromino
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
-let startingCountdownTimer;     // Countdown timer in frames before the game begins
 let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
+let canDropPiece = true;        // Determines whether or not the upcoming piece can be dropped (because another piece might be dropping)
+
+let chosenSong = 0;             // The index of the song we want to play
 let mappedPieces = [];          // Contains the list of pieces that have been mapped to the current song
-let effectsTxt;                 // The text file that stores the information about the mapped pieces
+let mappedPiecesTxt;            // Stores the text file that contains the mapped pieces for a given song
+
+let countdownStart;             // The time (in milliseconds) of the program when we enter the game scene
 let acceptanceAmount = 150;     // Amount in pixels that the piece has to be near the end before being accepted as a correct pose
-let startSecond;                // Represents the exact second the player started playing the game
+let startSecond = 0;            // Represents the exact second the player started playing the game
 let poseTime = 2;               // Time (in seconds) give to the player to pose a given piece
 let scalingFactor = scl*rows/poseTime;    // Converts seconds of the song to pixels in the screen
 let startDelay = 2;             // Amount of time (in seconds) before the music starts
@@ -47,7 +52,6 @@ let optimumRotation = -1;           // The optimum rotation for the current piec
 let lowestPlacementCost = 10000;    // The lowest cost of the current piece placement
 let optimumRight = -1;              // The optimum distance from the left side of the board for the current piece
 
-let canDropPiece = true;           // Determines whether or not the upcoming piece can be dropped (because another piece might be dropping)
 
 
 
@@ -69,22 +73,20 @@ function setupTetrisPart() {
       grid[i][j] = 0;
     }
   }
+
   
   // Create an empty 2D tetromino (each box of the tetromino will have an x and y value)
   for (let i = 0; i < 4; i++) currentTetromino[i] = [];
-
+  
   // If the score beats the highscore, then save the record values
   if(score > highScore) {
     highScore = score;
     highScoreLineCount = lineCount;
   }
-
+  
   // Reset these values for the next game
   score = 0;
   lineCount = 0;
-
-  // Set the countdown timer
-  startingCountdownTimer = 240;
 }
 
 
@@ -193,7 +195,7 @@ function moveSideways(dir, tetromino) {
 /*-------------------- Grid Functions -------------------*/
 // These functions control the grid's behavior
 function endGame() {
-  gameState = 2;
+  gameState = "Game Over";
   resetSound(themeSong);
   playSound(gameoverSound);
 }
@@ -853,13 +855,15 @@ function displayGameElements() {
   rect(scl*cols+70, acceptanceAmount/2, 100, acceptanceAmount);
 
   // Display the upcoming pieces
-  noStroke();
-  for(let i=0; i<mappedPieces.length; i++) {
-    var y = acceptanceAmount/2 + (mappedPieces[i].time+startSecond+startDelay-millis()/1000) * scalingFactor;
-    if(y > scl*rows - 40) continue;
+  if(startSecond != 0) {
+    noStroke();
+    for(let i=0; i<mappedPieces.length; i++) {
+      var y = acceptanceAmount/2 + (mappedPieces[i].time+startSecond+startDelay-millis()/1000) * scalingFactor;
+      if(y > scl*rows - 40) continue;
 
-    colorFromType(mappedPieces[i].type+1);
-    drawPieceShape(mappedPieces[i].type, scl*cols+70, y, 24);
+      colorFromType(mappedPieces[i].type+1);
+      drawPieceShape(mappedPieces[i].type, scl*cols+70, y, 24);
+    }
   }
   
   // Display the score and line count text, with their record values
@@ -887,8 +891,78 @@ function displayGameElements() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+/*-------------------- Update Functions -------------------*/
+// These functions update the game every frame of animation
+
+// General update function that is called every frame
+function updateGameElements() {
+  // If we still have pieces left in the song...
+  if(mappedPieces.length != 0) {
+    // Set the current tetromino type to the next piece that's coming in the song
+    currentTetrominoType = mappedPieces[0].type;
+
+    // Calculate the y position of the piece in the track
+    var y = acceptanceAmount/2+(mappedPieces[0].time+startSecond+startDelay-millis()/1000) * scalingFactor;
+    
+    // If the player couldn't pose in time, drop a scrambled tetromino
+    if (y < 0) {
+      upcomingPieces.push(currentTetrominoType+7);
+      playSound(wrongSound);
+      mappedPieces.shift();
+    } 
+    // If the player did do the correct pose in the allowed amount of time, drop an ordinary tetromino
+    else if(y < acceptanceAmount) {
+      if(allLabels.indexOf(label) == currentTetrominoType) {
+        upcomingPieces.push(currentTetrominoType);
+        playSound(correctSound);
+        mappedPieces.shift();
+      }
+    }
+  }
+
+  // If there are pieces ready to drop, drop the first one and wait for it to finish before dropping again
+  if(upcomingPieces.length != 0 && canDropPiece) {
+    // Drop the current piece with a given type and whether or not to scramble
+    dropTetromino(upcomingPieces[0]%7,(upcomingPieces[0]>6));
+    canDropPiece = false;
+  }
+
+  // After a certain amount of frames, move the current piece down
+  if (frameCount % speed == 0 && !canDropPiece) currentTetromino = moveDown(currentTetromino);
+}
+
+
+
+
+
+
+
+
+
 /*-------------------- Miscellaneous Functions -------------------*/
 // These functions perform various actions that aren't specific to one characteristic of the tetris game
+
+// Stops playing the given sound and sets it back to the beginning
+function resetSound(sound) {
+  sound.pause();
+  sound.currentTime = 0;
+}
+
+// Resets the given sound and plays it (essentially it plays a sound from the beginning)
+function playSound(sound) {
+  resetSound(sound);
+  sound.play();
+}
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
 function shuffleArray(array) {

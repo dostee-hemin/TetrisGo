@@ -107,8 +107,8 @@ function predict(results) {
   else if(isInPosition([3,3,3,3])) label = "I";
   else if(isInPosition([0,3,2,1])) label = "Z";
   else if(isInPosition([0,1,2,3])) label = "S";
-  else if(isInPosition([0,0,1,1])) label = "L";
-  else if(isInPosition([1,1,2,2])) label = "J";
+  else if(isInPosition([0,0,1,4])) label = "L";
+  else if(isInPosition([1,4,2,2])) label = "J";
   else label = "";
 }
 

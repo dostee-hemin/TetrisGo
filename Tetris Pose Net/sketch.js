@@ -61,8 +61,8 @@ function draw() {
     else if(isInPosition([3,3,3,3])) label = "I";
     else if(isInPosition([0,3,2,1])) label = "S";
     else if(isInPosition([0,1,2,3])) label = "Z";
-    else if(isInPosition([0,0,1,1])) label = "J";
-    else if(isInPosition([1,1,2,2])) label = "L";
+    else if(isInPosition([0,0,1,4])) label = "J";
+    else if(isInPosition([1,4,2,2])) label = "L";
 
     // Show the label on the screen
     fill(255);

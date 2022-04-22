@@ -1,45 +1,84 @@
-// This variable determines which scenario in the application we are in. It helps in scene navigation
-let gameState = 0;
+/*  This code file is split into the following sub-sections:
+  Variables               (the variables globally associated with the game)
+  Setup                   (initial setup of the program that is run once at the start)
+  Draw                    (continuous loop that is run every frame)
+  Game States             (the different stages of the program)
+  User Interaction        (manages user input like key presses and mouse clicks)
+*/
 
-function createEffects() {
-  // Load the effects text file and store the time and pose of each effect
-  for(let i=0; i<effectsTxt.length; i++) {
-    let elements = split(effectsTxt[i], " ");
-    mappedPieces[i] = {time: float(elements[0]), type: int(elements[1])};
-  }
-  console.log(mappedPieces);
-}
+
+
+
+
+/*-------------------- Variables -------------------*/
+
+// This variable determines which scenario in the application we are in. It helps in scene navigation
+let gameState = "Main Menu";
+let iconSize = 200;
+let canPickSong = false;
   
-async function setup() {  
+
+
+
+
+
+
+/*-------------------- Setup -------------------*/
+// This is the starting point of the program. 
+// It manages setting up the scene, loading data, and other initial preparations.
+function setup() {  
   createCanvas(1300, 800);
+
+  // Load the info about the songs
+  loadSongsInfo();
     
   // Call the setup function for the pose detection part of the application
   setupPoseDetectionPart();
 
   // Call the setup function for the tetris part of the application
   setupTetrisPart();
-  
-  effectsTxt = loadStrings('effects.txt', createEffects);
 }
 
+
+
+
+
+
+
+/*-------------------- Draw -------------------*/
+// This code is run every frame, 
+// and it is what we use to display and update the game
 function draw() {
   switch(gameState) {
     // Main Menu
-    case 0:
+    case "Main Menu":
       mainMenu();
       break;
     // Game Scene
-    case 1:
-    case 2:
+    case "Game Scene":
+    case "Game Over":
       gameScene();
       break;
     // Adjust Camera
-    case 3:
+    case "Adjust Camera":
       adjustCamera();
+      break;
+    case "Select Song":
+      selectSong();
       break;
   }
 }
 
+
+
+
+
+
+
+
+
+/*-------------------- Game States -------------------*/
+// Function that is called when we are in the main menu
 function mainMenu() {
   // Set a solid background color
   background(0,40,120);
@@ -57,6 +96,8 @@ function mainMenu() {
   }
 }
 
+
+// Function that is called when we are adjusting the camera
 function adjustCamera() {
   // Set a solid background color
   background(0,40,120);
@@ -109,6 +150,78 @@ function adjustCamera() {
   text("Press 'Enter' to Confirm", 230, height-50);
 }
 
+
+// Function that is called when we want to choose a song
+function selectSong() {
+  // Set a solid background color
+  background(0,40,120);
+
+  // Title of page
+  fill(255);
+  textSize(80);
+  noStroke();
+  text("Select a Song", width/2, 75);
+
+  for(var i=0; i<4; i++) {
+    for(var j=0; j<3; j++) {
+      var x = 50+i*iconSize*1.25;
+      var y = 150+j*iconSize*1.25;
+
+      var index = i+j*4;
+
+      if(index >= songs.length) continue;
+
+      // Display picture
+      noStroke();
+      image(songs[index].cover, x, y, iconSize, iconSize);
+
+      
+      // Display difficulty
+      switch(songs[index].difficulty) {
+        case 0:
+          fill(0,255,0,100);
+          break;
+        case 1:
+          fill(255,255,0,100);
+          break;
+        case 2:
+          fill(255,0,0,100);
+          break;
+      }
+      noStroke();
+      rect(x,y+iconSize*0.8,iconSize,iconSize*0.2);
+      
+      
+      
+      // Display Name
+      fill(255);
+      textSize(40);
+      textAlign(CENTER);
+      text(songs[index].name, x+iconSize/2, y+iconSize*1.2);
+      
+      // Display mouse over image
+      if(mouseX > x && mouseX < x+iconSize && mouseY > y && mouseY < y+iconSize) {
+        stroke(0,255,0);
+
+        // If the mouse has been clicked, enter the game scene with the song the user has picked
+        if(canPickSong) {
+          gameState = "Game Scene";
+          chosenSong = index;
+          countdownStart = millis();
+          mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+        }
+      }
+      else stroke(200);
+      strokeWeight(10);
+      noFill();
+      rectMode(CORNER);
+      rect(x,y,iconSize,iconSize, 10);
+    }
+  }
+}
+
+
+// Function that is called when we are in the game scene
 function gameScene() {
   // Draw a gradient background
   for(let y=0; y<height; y++) {
@@ -123,35 +236,8 @@ function gameScene() {
   // Display all the graphics related to the tetris game
   displayGameElements();
 
-  // At this point, the program has displayed the game scene, 
-  // but we should update only if the countdown timer has finished.
-  if(gameState == 1) {
-    if(startingCountdownTimer > 0) {
-      // Dim the screen black
-      fill(0,200);
-      noStroke();
-      rectMode(CORNER);
-      rect(0,0,width,height);
-
-      // Timer
-      let txts = ["GO!", "1", "2", "3"];
-      fill(255,255,0);
-      textSize(150);
-      textAlign(CENTER);
-      text(txts[int(startingCountdownTimer/60)], width/2, height/2);
-
-      // Everytime the countdown timer loses a second (i.e. 60 frames), play a sound
-      if(startingCountdownTimer % 60 == 0) {
-        if(startingCountdownTimer < 120) goSound.play();
-        else playSound(countdownSound);
-      }
-
-      
-      // Decrement the frames remaining in the timer
-      startingCountdownTimer--;
-      return;
-    }  
-  } else {
+  // If the game is over, display the text and leave the function
+  if  (gameState == "Game Over") {
     // Dim the screen black
     fill(0,200);
     noStroke();
@@ -178,68 +264,86 @@ function gameScene() {
     return;
   }
 
-  // Once the countdown timer finishes, play the theme song
-  if(startingCountdownTimer > -10 && startingCountdownTimer != 20) {
-    startingCountdownTimer = -20;
-    startSecond = millis()/1000;
-  }
+  // Update and display the countdown timer and leave the function
+  var currentSecond = floor(millis()-countdownStart)/1000;
+  if(currentSecond < 4) {
 
-  if(millis()/1000 > startSecond + startDelay) themeSong.play();
+    // Dim the screen black
+    fill(0,200);
+    noStroke();
+    rectMode(CORNER);
+    rect(0,0,width,height);
 
+    // Timer
+    let txts = ["3", "2", "1", "GO!"];
+    fill(255,255,0);
+    textSize(150);
+    textAlign(CENTER);
+    text(txts[int(currentSecond)], width/2, height/2);
 
-
-  /*----------------- Tetris Part ----------------*/
-
-  // Set the current tetromino type to the next piece that's coming in the song
-  currentTetrominoType = mappedPieces[0].type;
-
-  // Calculate the y position of the piece in the track
-  var y = acceptanceAmount/2+(mappedPieces[0].time+startSecond+startDelay-millis()/1000) * scalingFactor;
-  
-  // If the player couldn't pose in time, drop a scrambled tetromino
-  if (y < 0) {
-    upcomingPieces.push(currentTetrominoType+7);
-    playSound(wrongSound);
-    mappedPieces.shift();
-  } 
-  // If the player did do the correct pose in the allowed amount of time, drop an ordinary tetromino
-  else if(y < acceptanceAmount) {
-    if(allLabels.indexOf(label) == currentTetrominoType) {
-      upcomingPieces.push(currentTetrominoType);
-      playSound(correctSound);
-      mappedPieces.shift();
+    // Everytime the countdown timer loses a second (i.e. 60 frames), play a sound
+    if(currentSecond % 1 < 0.1) {
+      if(currentSecond > 3) goSound.play();
+      else playSound(countdownSound);
     }
+    return;
+  } 
+  // Once the countdown timer finishes, set the time that the game starts
+  else if (startSecond == 0) {
+    startSecond = millis()/1000;
+    songs[chosenSong].music.play(startDelay);
   }
+  
 
-  // If there are pieces ready to drop, drop the first one and wait for it to finish before dropping again
-  if(upcomingPieces.length != 0 && canDropPiece) {
-    // Drop the current piece with a given type and whether or not to scramble
-    dropTetromino(upcomingPieces[0]%7,(upcomingPieces[0]>6));
-    canDropPiece = false;
-  }
-
-  // After a certain amount of frames, move the current piece down
-  if (frameCount % speed == 0 && !canDropPiece) currentTetromino = moveDown(currentTetromino);
+  updateGameElements();
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*-------------------- User Interaction -------------------*/
+// Function that is called when the user presses a key
 function keyPressed() {
   switch(gameState) {
-    case 0:
+    case "Main Menu":
       // In the main menu, if the user presses the enter key, move on to adjusting the camera
-      if(keyCode == RETURN) gameState = 3;
+      if(keyCode == RETURN) gameState = "Adjust Camera";
       break;
-    case 2:
+    case "Game Over":
       // In the game over scene, if the user presses the r key, reset the game
       if(key == 'r') {
         setupTetrisPart();
-        gameState = 1;
+        gameState = "Game Scene";
       }
       break;
-    case 3:
+    case "Adjust Camera":
       // In the adjust camera panel, if the user presses the enter key, start the tetris game
-      if(keyCode == RETURN) {
-        gameState = 1;
-      }
+      if(keyCode == RETURN) gameState = "Select Song";
       break;
   }
+}
+
+// Function that is called when the user presses the mouse
+function mousePressed() {
+  switch(gameState) {
+    case "Select Song":
+      // In the select song panel, allow the user to select the song the mouse is currently hovering over
+      canPickSong = true;
+      break;
+  }
+}
+
+// Function that is called when the user releases the mouse
+function mouseReleased() {
+  canPickSong = false;
 }

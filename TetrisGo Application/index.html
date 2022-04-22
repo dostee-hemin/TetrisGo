@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+    <script language="javascript" src="https://cdn.jsdelivr.net/npm/p5@1.4.1/lib/addons/p5.sound.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
@@ -12,17 +13,16 @@
     <script src="sketch.js"></script>
     <script src="tetrisPart.js"></script>
     <script src="poseDetectionPart.js"></script>
-    <script src="soundControl.js"></script>
+    <script src="loadAndSave.js"></script>
   </head>
   <body>
     <video autoplay="true" id="video"></video>
-    <audio id="themeSong"><source src="assets/theme.mp3"></audio>
-    <audio id="go"><source src="assets/go.mp3"></audio>
-    <audio id="countdown"><source src="assets/countdown.mp3"></audio>
-    <audio id="correct"><source src="assets/correct.mp3"></audio>
-    <audio id="wrong"><source src="assets/wrong.mp3"></audio>
-    <audio id="lineclear"><source src="assets/lineclear.mp3"></audio>
-    <audio id="tetris"><source src="assets/tetris.mp3"></audio>
-    <audio id="gameover"><source src="assets/game over.mp3"></audio>
+    <audio id="go"><source src="assets/Sounds/go.mp3"></audio>
+    <audio id="countdown"><source src="assets/Sounds/countdown.mp3"></audio>
+    <audio id="correct"><source src="assets/Sounds/correct.mp3"></audio>
+    <audio id="wrong"><source src="assets/Sounds/wrong.mp3"></audio>
+    <audio id="lineclear"><source src="assets/Sounds/lineclear.mp3"></audio>
+    <audio id="tetris"><source src="assets/Sounds/tetris.mp3"></audio>
+    <audio id="gameover"><source src="assets/Sounds/game over.mp3"></audio>
   </body>
 </html>
