@@ -1,0 +1,2 @@
+Beats per minute = 140.0
+Beat offset = 0.13999999
