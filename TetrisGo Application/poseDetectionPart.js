@@ -177,6 +177,7 @@ function displayPoseElements() {
     push();
     translate(video.width,-video.height/2);
     scale(-1,1);
+    imageMode(CORNER);
     image(video,0,0);
     pop();
     

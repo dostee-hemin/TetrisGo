@@ -16,6 +16,7 @@
 let gameState = "Main Menu";
 let iconSize = 200;
 let canPickSong = false;
+let isDoingTutorial = false;
   
 
 
@@ -56,8 +57,10 @@ function draw() {
       break;
     // Game Scene
     case "Game Scene":
-    case "Game Over":
       gameScene();
+      break;
+    case "Game Over":
+      gameOver();
       break;
     // Adjust Camera
     case "Adjust Camera":
@@ -65,6 +68,9 @@ function draw() {
       break;
     case "Select Song":
       selectSong();
+      break;
+    case "Tutorial":
+      tutorialScene();
       break;
   }
 }
@@ -160,7 +166,20 @@ function selectSong() {
   fill(255);
   textSize(80);
   noStroke();
+  textAlign(CENTER, CENTER);
   text("Select a Song", width/2, 75);
+
+  // Toggle switch for Tutorial
+  if(isDoingTutorial) fill(0,255,0);
+  else noFill();
+  stroke(150);
+  strokeWeight(10);
+  rectMode(CENTER);
+  rect(width/2,height-50,75,75);
+  fill(255);
+  noStroke();
+  textSize(50);
+  text("Tutorial", width/2-150,height-45);
 
   for(var i=0; i<4; i++) {
     for(var j=0; j<3; j++) {
@@ -189,6 +208,7 @@ function selectSong() {
           break;
       }
       noStroke();
+      rectMode(CORNER);
       rect(x,y+iconSize*0.8,iconSize,iconSize*0.2);
       
       
@@ -200,13 +220,21 @@ function selectSong() {
       text(songs[index].name, x+iconSize/2, y+iconSize*1.2);
       
       // Display mouse over image
-      if(mouseX > x && mouseX < x+iconSize && mouseY > y && mouseY < y+iconSize) {
+      if(mouseInRect(x,x+iconSize,y,y+iconSize)) {
         stroke(0,255,0);
 
         // If the mouse has been clicked, enter the game scene with the song the user has picked
         if(canPickSong) {
-          gameState = "Game Scene";
           chosenSong = index;
+
+          if(isDoingTutorial) {
+            startSecond = millis()/1000;
+            gameState = "Tutorial";
+            mappedPieces = tutorialPieces;
+            return;
+          }
+
+          gameState = "Game Scene";
           countdownStart = millis();
           mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
         }
@@ -235,34 +263,7 @@ function gameScene() {
 
   // Display all the graphics related to the tetris game
   displayGameElements();
-
-  // If the game is over, display the text and leave the function
-  if  (gameState == "Game Over") {
-    // Dim the screen black
-    fill(0,200);
-    noStroke();
-    rectMode(CORNER);
-    rect(0,0,width,height);
-
-    // Game over text
-    fill(255,0,0);
-    textSize(150);
-    textAlign(CENTER);
-    if(int(frameCount/30)%2 == 0) text("Game Over", width/2, 200);
-
-    // Stats
-    fill(255);
-    textSize(75);
-    text("Score = " + score, width/2, height/2-50);
-    text("Line Count = " + lineCount, width/2, height/2+50);
-    text("Best Score = " + highScore, width/2, height/2+150);
-    text("Best Line Count = " + highScoreLineCount, width/2, height/2+250);
-
-    // Restart
-    fill(200);
-    text("Press 'r' to restart", width/2, height/2+350);
-    return;
-  }
+  displayTetrisElements();
 
   // Update and display the countdown timer and leave the function
   var currentSecond = floor(millis()-countdownStart)/1000;
@@ -275,7 +276,7 @@ function gameScene() {
     rect(0,0,width,height);
 
     // Timer
-    let txts = ["3", "2", "1", "GO!"];
+    var txts = ["3", "2", "1", "GO!"];
     fill(255,255,0);
     textSize(150);
     textAlign(CENTER);
@@ -299,51 +300,71 @@ function gameScene() {
 }
 
 
+function tutorialScene() {
+  // Draw a gradient background
+  for(let y=0; y<height; y++) {
+    stroke(0,map(y,0,height,0,255),255);
+    strokeWeight(1);
+    line(0,y,width,y);
+  }
 
+  displayPoseElements();
+  displayTetrisElements();
+  updateGameElements();
 
+  if(startSecond + startDelay - millis()/1000 > -1.5) {
+    fill(255);
+    textSize(25);
+    textAlign(CENTER);
+    noStroke();
+    text("When the piece comes here,\nmake the correct pose", 170, 50+acceptanceAmount/2);
 
+    stroke(255);
+    strokeWeight(5);
+    line(340,50+acceptanceAmount/2,390,50+acceptanceAmount/2);
+    line(365,25+acceptanceAmount/2,390,50+acceptanceAmount/2);
+    line(365,75+acceptanceAmount/2,390,50+acceptanceAmount/2);
+  }
+  
+  if(mappedPieces.length != 0) {
+    if(abs((mappedPieces[0].time + startSecond + startDelay)-millis()/1000) < poseTime-0.3) {
+      imageMode(CENTER);
+      image(poseImages[mappedPieces[0].type], 210, height/2, 400, 400);
+    }
+  }
 
-
-
-
-
-
-
-
-
-/*-------------------- User Interaction -------------------*/
-// Function that is called when the user presses a key
-function keyPressed() {
-  switch(gameState) {
-    case "Main Menu":
-      // In the main menu, if the user presses the enter key, move on to adjusting the camera
-      if(keyCode == RETURN) gameState = "Adjust Camera";
-      break;
-    case "Game Over":
-      // In the game over scene, if the user presses the r key, reset the game
-      if(key == 'r') {
-        setupTetrisPart();
-        gameState = "Game Scene";
-      }
-      break;
-    case "Adjust Camera":
-      // In the adjust camera panel, if the user presses the enter key, start the tetris game
-      if(keyCode == RETURN) gameState = "Select Song";
-      break;
+  if(millis()/1000 > startSecond+40) {
+    gameState = "Game Scene";
+    countdownStart = millis();
+    startSecond = 0;
+    setupTetrisPart();
+    mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
   }
 }
 
-// Function that is called when the user presses the mouse
-function mousePressed() {
-  switch(gameState) {
-    case "Select Song":
-      // In the select song panel, allow the user to select the song the mouse is currently hovering over
-      canPickSong = true;
-      break;
+function gameOver() {
+  // Draw a gradient background
+  for(let y=0; y<height; y++) {
+    stroke(0,map(y,0,height,0,255),255);
+    strokeWeight(1);
+    line(0,y,width,y);
   }
-}
 
-// Function that is called when the user releases the mouse
-function mouseReleased() {
-  canPickSong = false;
+  // Game over text
+  fill(255,0,0);
+  textSize(150);
+  textAlign(CENTER);
+  if(int(frameCount/30)%2 == 0) text("Game Over", width/2, 200);
+
+  // Stats
+  fill(255);
+  textSize(75);
+  text("Score = " + score, width/2, height/2-50);
+  text("Line Count = " + lineCount, width/2, height/2+50);
+  text("Best Score = " + highScore, width/2, height/2+150);
+  text("Best Line Count = " + highScoreLineCount, width/2, height/2+250);
+
+  // Restart
+  fill(200);
+  text("Press 'r' to restart", width/2, height/2+350);
 }

@@ -4,7 +4,6 @@
 */
 
 
-
 /*-------------------- Variables -------------------*/
 
 // These are the sounds of the game that will be played...
@@ -16,6 +15,8 @@ let wrongSound;                     // When the player runs out of posing time
 let lineclearSound;                 // When 1-3 lines are cleared
 let tetrisSound;                    // When 4 lines are cleared
 let gameoverSound;                  // When the player tops out
+
+let poseImages = [];
 
 
 
@@ -40,6 +41,21 @@ function preload() {
     lineclearSound = document.getElementById("lineclear");
     tetrisSound = document.getElementById("tetris");
     gameoverSound = document.getElementById("gameover");
+
+    poseImages[0] = loadImage("assets/Images/O.jpg");
+    poseImages[1] = loadImage("assets/Images/I.jpg");
+    poseImages[2] = loadImage("assets/Images/T.jpg");
+    poseImages[3] = loadImage("assets/Images/S.jpg");
+    poseImages[4] = loadImage("assets/Images/Z.jpg");
+    poseImages[5] = loadImage("assets/Images/L.jpg");
+    poseImages[6] = loadImage("assets/Images/J.jpg");
+
+    highscoreTxt = loadStrings("assets/Extras/highscore.txt", setupHighScore);
+}
+
+function setupHighScore() {
+  highScore = int(highscoreTxt[0]);
+  highScoreLineCount = int(highscoreTxt[1]);
 }
 
 // Loads the songs and their information

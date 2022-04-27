@@ -36,14 +36,15 @@ let mappedPiecesTxt;            // Stores the text file that contains the mapped
 let countdownStart;             // The time (in milliseconds) of the program when we enter the game scene
 let acceptanceAmount = 150;     // Amount in pixels that the piece has to be near the end before being accepted as a correct pose
 let startSecond = 0;            // Represents the exact second the player started playing the game
-let poseTime = 2;               // Time (in seconds) give to the player to pose a given piece
+let poseTime = 3;               // Time (in seconds) give to the player to pose a given piece
 let scalingFactor = scl*rows/poseTime;    // Converts seconds of the song to pixels in the screen
-let startDelay = 2;             // Amount of time (in seconds) before the music starts
+let startDelay = 3;             // Amount of time (in seconds) before the music starts
 
 let lineCount = 0;              // Number of lines cleared in total
 let highScoreLineCount = 0;     // Best number of line clears
 let score = 0;                  // Score of the game
 let highScore = 0;              // Best score of the game
+let highscoreTxt;
 
 // The weights of each attribute used in determining the optimum piece placement
 let costWeights = [2.67,1.31,1.32,1.78,1.35,1.02,1.52,1.11];
@@ -51,6 +52,23 @@ let maximumNumberOfRotations = 0;   // The number of times its possible to rotat
 let optimumRotation = -1;           // The optimum rotation for the current piece
 let lowestPlacementCost = 10000;    // The lowest cost of the current piece placement
 let optimumRight = -1;              // The optimum distance from the left side of the board for the current piece
+
+let tutorialPieces = [          // Stores the pieces that will be used in the tutorial section
+  {time: 4, type: 0}, 
+  {time: 7, type: 1}, 
+  {time: 10, type: 2}, 
+  {time: 13, type: 3}, 
+  {time: 16, type: 4}, 
+  {time: 19, type: 5}, 
+  {time: 22, type: 6},
+  {time: 25, type: 0}, 
+  {time: 25.6, type: 2}, 
+  {time: 28, type: 3}, 
+  {time: 28.6, type: 4}, 
+  {time: 31, type: 5}, 
+  {time: 31.6, type: 6}, 
+  {time: 34, type: 1},
+  {time: 34.6, type: 2}];
 
 
 
@@ -82,11 +100,17 @@ function setupTetrisPart() {
   if(score > highScore) {
     highScore = score;
     highScoreLineCount = lineCount;
+    saveStrings([str(highScore),str(highScoreLineCount)], "highscore.txt");
   }
   
   // Reset these values for the next game
   score = 0;
   lineCount = 0;
+
+  mappedPieces = [];
+  upcomingPieces = [];
+  canDropPiece = true;
+  startSecond = 0;
 }
 
 
@@ -196,7 +220,7 @@ function moveSideways(dir, tetromino) {
 // These functions control the grid's behavior
 function endGame() {
   gameState = "Game Over";
-  resetSound(themeSong);
+  resetSound(songs[chosenSong].music);
   playSound(gameoverSound);
 }
 
@@ -821,27 +845,9 @@ function drawPieceShape(pieceType, centerX, centerY, blockSize) {
 }
 
 // Displays every tetris element like it was in the draw function
-function displayGameElements() {
+function displayTetrisElements() {
   push();
   translate(100,50);
-  // Display all elements in the grid
-  noStroke();
-  rectMode(CORNER);
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      colorFromType(grid[i][j]);
-      rect(i * scl, j * scl, scl, scl);
-    }
-  }
-
-  // Display the current tetromino only if it is currently being dropped
-  if(!canDropPiece) {
-    for (let i = 0; i < 4; i++) {
-      colorFromType((upcomingPieces[0]%7)+1);
-      rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
-    }
-  }
-
   // Display the board that contains the upcoming pieces
   fill(50);
   stroke(25);
@@ -865,7 +871,30 @@ function displayGameElements() {
       drawPieceShape(mappedPieces[i].type, scl*cols+70, y, 24);
     }
   }
-  
+  pop();
+}
+
+function displayGameElements() {
+  push();
+  translate(100,50);
+  // Display all elements in the grid
+  noStroke();
+  rectMode(CORNER);
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j++) {
+      colorFromType(grid[i][j]);
+      rect(i * scl, j * scl, scl, scl);
+    }
+  }
+
+  // Display the current tetromino only if it is currently being dropped
+  if(!canDropPiece) {
+    for (let i = 0; i < 4; i++) {
+      colorFromType((upcomingPieces[0]%7)+1);
+      rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
+    }
+  }
+
   // Display the score and line count text, with their record values
   fill(0);
   textSize(30);
@@ -875,11 +904,6 @@ function displayGameElements() {
   text("Best score = " + highScore, (cols-cols/10)*scl, rows*scl + 40);
   text("Best lines = " + highScoreLineCount, (cols-cols/10)*scl, rows*scl + 90);
   pop();
-
-  // Display the current piece shape on the video feed
-  fill(255,150);
-  noStroke();
-  drawPieceShape(currentTetrominoType, width/2 + video.width/2, height/2, 150);
 }
 
 
