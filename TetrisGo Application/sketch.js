@@ -72,6 +72,9 @@ function draw() {
     case "Tutorial":
       tutorialScene();
       break;
+    case "Level Completed":
+      levelCompleted();
+      break;
   }
 }
 
@@ -367,4 +370,32 @@ function gameOver() {
   // Restart
   fill(200);
   text("Press 'r' to restart", width/2, height/2+350);
+}
+
+function winTheGame() {
+  gameState = "Level Completed";
+}
+
+function levelCompleted() {
+  // Draw a gradient background
+  for(let y=0; y<height; y++) {
+    stroke(0,map(y,0,height,0,255),255);
+    strokeWeight(1);
+    line(0,y,width,y);
+  }
+
+  // Win text
+  fill(255,255,0);
+  textSize(150);
+  textAlign(CENTER);
+  noStroke();
+  text("Level Completed!", width/2, 200);
+
+  // Stats
+  fill(255);
+  textSize(75);
+  text("Score = " + score, width/2, height/2-50);
+  text("Line Count = " + lineCount, width/2, height/2+50);
+  text("Best Score = " + highScore, width/2, height/2+150);
+  text("Best Line Count = " + highScoreLineCount, width/2, height/2+250);
 }

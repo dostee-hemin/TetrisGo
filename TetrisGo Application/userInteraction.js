@@ -8,6 +8,7 @@ function keyPressed() {
         break;
       case "Game Scene":
       case "Game Over":
+      case "Level Completed":
         // If the user presses the r key, reset the game
         if(key == 'r') {
           setupTetrisPart();
