@@ -47,7 +47,7 @@ let highScore = 0;              // Best score of the game
 let highscoreTxt;
 
 // The weights of each attribute used in determining the optimum piece placement
-let costWeights = [2.67,1.31,1.32,1.78,1.35,1.02,1.52,1.11];
+let costWeights = [0.87,3.54,0.99,1.48,2.49,1.87];
 let maximumNumberOfRotations = 0;   // The number of times its possible to rotate the current piece
 let optimumRotation = -1;           // The optimum rotation for the current piece
 let lowestPlacementCost = 10000;    // The lowest cost of the current piece placement
@@ -100,7 +100,6 @@ function setupTetrisPart() {
   if(score > highScore) {
     highScore = score;
     highScoreLineCount = lineCount;
-    saveStrings([str(highScore),str(highScoreLineCount)], "highscore.txt");
   }
   
   // Reset these values for the next game
@@ -581,10 +580,8 @@ function findOptimumPiecePlacement() {
         for (let k = 0; k < 4; k++) {
           currentSimulationTetromino[k][0]++;
           if(currentSimulationTetromino[k][0] == cols-1) {
-            cost += costWeights[0];
           }
         }
-        cost += costWeights[6];
       }
       
 
@@ -617,7 +614,7 @@ function findOptimumPiecePlacement() {
         }
 
         // Increase the cost based on the height of the box
-        cost += (rows-currentSimulationTetromino[i][1])*costWeights[1];
+        cost += (rows-currentSimulationTetromino[i][1])*costWeights[0];
       }
       // If the rotation is invalid, move on to the next rotation
       if(!isRotationValid) continue;
@@ -658,7 +655,7 @@ function findOptimumPiecePlacement() {
       }
       // Favor more tetrises and less burns
       if(numberOfClears == 4) {
-        cost -= costWeights[7]*3;
+        cost -= costWeights[1]*3;
       } else {
         cost += numberOfClears*costWeights[2];
       }

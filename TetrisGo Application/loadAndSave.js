@@ -49,8 +49,6 @@ function preload() {
     poseImages[4] = loadImage("assets/Images/Z.jpg");
     poseImages[5] = loadImage("assets/Images/L.jpg");
     poseImages[6] = loadImage("assets/Images/J.jpg");
-
-    highscoreTxt = loadStrings("assets/Extras/highscore.txt", setupHighScore);
 }
 
 function setupHighScore() {
@@ -64,6 +62,7 @@ function loadSongsInfo() {
     // Every element needs the name of the song and the difficulty
     songs[0] = {name: "Tetris Theme", difficulty:2};
     songs[1] = {name: "Beggin'", difficulty:1};
+    songs[2] = {name: "Ah Yani", difficulty:0};
   
     // Loop through all songs and load their music and cover images
     for(var i=0; i<songs.length; i++) {

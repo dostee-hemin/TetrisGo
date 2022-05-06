@@ -22,9 +22,9 @@ let recordPieceCount = 0;
 
 //let population = [[1,1,1,1,1,1,1,1]];
 let population = [];
-let startingGenes = [2.67,1.31,1.32,1.78,1.35,1.02,1.52,1.11]
+// let startingGenes = [1.31,1.32,1.78,1.35,1.02,1.11];
 let populationSize = 16;
-let numberOfGenes = 8;
+let numberOfGenes = 6;
 let currentSpecies = 0;
 let bestSpeciesRecord = 0;
 let bestSpecies = -1;
@@ -35,22 +35,22 @@ let speedUpSimulation = false;
 function setup() {
   createCanvas(displayWidth, displayHeight * 0.8);
 
-  // for(let i=0; i<populationSize; i++) {
-  //   population[i] = [];
-  //   for(let j=0; j<numberOfGenes; j++) {
-  //     population[i][j] = random(1,3);
-  //   }
-  // }
   for(let i=0; i<populationSize; i++) {
     population[i] = [];
     for(let j=0; j<numberOfGenes; j++) {
-      if(random(1) < 0.5) {
-        population[i][j] = startingGenes[j] + random(-0.5,0.5);
-      } else {
-        population[i][j] = startingGenes[j];
-      }
+      population[i][j] = random(1,3);
     }
   }
+  // for(let i=0; i<populationSize; i++) {
+  //   population[i] = [];
+  //   for(let j=0; j<numberOfGenes; j++) {
+  //     if(random(1) < 0.5) {
+  //       population[i][j] = startingGenes[j] + random(-0.5,0.5);
+  //     } else {
+  //       population[i][j] = startingGenes[j];
+  //     }
+  //   }
+  // }
   for(let i=0; i<numberOfGenes; i++) {
     bestGenesOverall[i] = 0;
   }
@@ -200,8 +200,6 @@ function newTrominio() {
 
   /* Find the best way to place the current piece */
   // The way we calculate scores is based on:
-  // - Horizontal position (left side of the grid is favored)
-  // - Tetris column (rightmost side of the grid is unfavored)
   // - Vertical position (the bottom of the grid is favored)
   // - Number of holes created (less holes created is favored)
   // - Number of lines cleared (more lines cleared is favored)
@@ -250,11 +248,7 @@ function newTrominio() {
       for (let j = 0; j < currentColumn; j++) {
         for (let k = 0; k < 4; k++) {
           currentSimulationTetromino[k][0]++;
-          if(currentSimulationTetromino[k][0] == cols-1) {
-            cost += population[currentSpecies][0];
-          }
         }
-        cost += population[currentSpecies][6];
       }
       
 
@@ -287,7 +281,7 @@ function newTrominio() {
         }
 
         // Increase the cost based on the height of the box
-        cost += (rows-currentSimulationTetromino[i][1])*population[currentSpecies][1];
+        cost += (rows-currentSimulationTetromino[i][1])*population[currentSpecies][0];
       }
       // If the rotation is invalid, move on to the next rotation
       if(!isRotationValid) {
@@ -337,7 +331,7 @@ function newTrominio() {
       }
       // Favor more tetrises and less burns
       if(numberOfClears == 4) {
-        cost -= population[currentSpecies][7]*3;
+        cost -= population[currentSpecies][1]*3;
       } else {
         cost += numberOfClears*population[currentSpecies][2];
       }
@@ -433,21 +427,6 @@ function newTrominio() {
 function draw() {
   background(50);
 
-  if (recordRotation != -1) {
-    for (let i = 0; i < recordRotation; i++) {
-      currentTetromino = rotatePiece(1, currentTetromino);
-    }
-    while (moveSideways(-1, currentTetromino) != currentTetromino) {
-      currentTetromino = moveSideways(-1, currentTetromino);
-    }
-    for (let i = 0; i < recordRight; i++) {
-      currentTetromino = moveSideways(1, currentTetromino);
-    }
-    recordRotation = -1;
-    recordCost = 10000;
-    recordRight = -1;
-  }
-
   // Display all elements in the grid
   noStroke();
   for (let i = 0; i < cols; i++) {
@@ -463,15 +442,27 @@ function draw() {
     rect(currentTetromino[i][0] * scl, currentTetromino[i][1] * scl, scl, scl);
   }
 
+  var numberOfIterations = 1;
+  if(speedUpSimulation) numberOfIterations = floor(map(mouseX,5,width,5,10000));
+
   // After a certain amount of frames, move down
-  if (frameCount % speed == 0) {
-    if(speedUpSimulation) {
-      while(moveDown(currentTetromino) != currentTetromino) {
-        currentTetromino = moveDown(currentTetromino);
+  for(var i=0; i<numberOfIterations; i++) {
+    if (recordRotation != -1) {
+      for (let i = 0; i < recordRotation; i++) {
+        currentTetromino = rotatePiece(1, currentTetromino);
       }
-    }else {
-      currentTetromino = moveDown(currentTetromino);
+      while (moveSideways(-1, currentTetromino) != currentTetromino) {
+        currentTetromino = moveSideways(-1, currentTetromino);
+      }
+      for (let i = 0; i < recordRight; i++) {
+        currentTetromino = moveSideways(1, currentTetromino);
+      }
+      recordRotation = -1;
+      recordCost = 10000;
+      recordRight = -1;
     }
+
+    currentTetromino = moveDown(currentTetromino);
   }
 
   fill(255);
@@ -492,6 +483,8 @@ function draw() {
   text("Species = " + currentSpecies, width / 4 + 100, 400);
   text("Current genes = " + nf(population[currentSpecies],1,2), width / 4 + 100, 450);
   text("Best genes = " + bestGenesOverall, width / 4 + 100, 500);
+  text("Number of Iterations per Frame = " + numberOfIterations, width / 4 + 100, 600);
+  text("Framerate = " + round(frameRate()), width / 4 + 100, 650);
 }
 
 function colorFromType(type) {
@@ -535,7 +528,7 @@ function reset() {
     }
   }
 
-  if(tetrisRate*tetrisCount > recordTetrisRate*recordTetrisCount) {
+  if(pieceCount*tetrisRate > recordPieceCount*recordTetrisRate) {
     for(let gene=0; gene<numberOfGenes; gene++) {
       bestGenesOverall[gene] = nf(population[currentSpecies][gene],1,2);
     }
@@ -546,8 +539,8 @@ function reset() {
     recordPieceCount = pieceCount;
   }
 
-  if(tetrisRate*tetrisCount > bestSpeciesRecord) {
-    bestSpeciesRecord = tetrisRate*tetrisCount;
+  if(pieceCount*tetrisRate > bestSpeciesRecord) {
+    bestSpeciesRecord = pieceCount*tetrisRate;
     bestSpecies = currentSpecies;
   }
 
