@@ -64,7 +64,19 @@ class Timeline {
     fill(255);
     textSize(20);
     textAlign(CORNER);
-    text("Current time = " + minutes + ":" + nf(seconds, 2) + ":" + milliseconds, 100, 440);
+    text("Current time = " + minutes + ":" + nf(seconds, 2) + ":" + milliseconds, 100, 50);
+    
+    // Current position bar
+    fill(200);
+    noStroke();
+    rectMode(CORNER);
+    rect(100,60,250,25);
+    fill(0,255,0);
+    rect(100,60,cursorPosition/(song.length()/1000) * 250, 25);
+    stroke(255);
+    strokeWeight(2);
+    noFill();
+    rect(100,60,250,25);
 
     // Waveform box
     rectMode(CENTER);

@@ -64,7 +64,7 @@ void mousePressed() {
           }
         }
         int type = round((effectBoard.cursor.y-480)/42.8);
-        if (canAddEffect && mouseButton == LEFT) {
+        if (canAddEffect && mouseButton == LEFT && type != 7) {
           float position = (effectBoard.cursor.x-100)/pixelsPerSecond + timelinePosition;
           effects.add(new Effect(position, type));
           SaveEffects();
@@ -138,4 +138,10 @@ void mousePressed() {
     SaveBeatsInfo();
     break;
   }
+}
+
+void mouseWheel(MouseEvent event) {
+  float direction = -event.getCount();
+  float speed = 50 / float(pixelsPerSecond);
+  timeline.moveTimelinePosition(direction * speed);
 }

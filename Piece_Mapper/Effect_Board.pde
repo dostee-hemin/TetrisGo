@@ -77,10 +77,131 @@ class EffectBoard {
     text("-      +", 53, 625);
     text("-      +", 53, 675);
 
-
+    int[] counts = new int[7];
     // Update and display all the effects
     for (Effect e : effects) {
       e.display();
+      counts[e.effectType]++;
+    }
+
+
+    // Display the current count of all the pieces
+    int maxSize = 35;
+      for (int i=0; i<7; i++) {
+      float xPosition = width/2+280+i*50;
+      float yPosition = 100;
+      fill(255);
+      textSize(20);
+      textAlign(CENTER);
+      text(counts[i], width/2+280+i*50, 150);
+
+      color fillColor = color(255);
+      switch(i) {
+      case 0:
+        // O
+        fillColor = color(255, 255, 0);
+        break;
+      case 1:
+        // I
+        fillColor = color(0, 255, 255);
+        break;
+      case 2:
+        // T
+        fillColor = color(255, 0, 255);
+        break;
+      case 3:
+        // S
+        fillColor = color(0, 255, 0);
+        break;
+      case 4:
+        // Z
+        fillColor = color(255, 0, 0);
+        break;
+      case 5:
+        // L
+        fillColor = color(255, 100, 0);
+        break;
+      case 6:
+        // J
+        fillColor = color(0, 0, 255);
+        break;
+      }
+
+      fill(fillColor);
+      stroke(getDarker(color(fillColor), 0.6));
+      colorMode(RGB);
+      strokeWeight(3);
+      switch(i) {
+      case 0:
+        // O
+        rect(xPosition, yPosition, maxSize*0.9, maxSize*0.9);
+        break;
+      case 1:
+        // I
+        rect(xPosition, yPosition, maxSize*0.4, maxSize*0.9);
+        break;
+      case 2:
+        // T
+        beginShape();
+        vertex(xPosition-maxSize/2, yPosition-maxSize/4);
+        vertex(xPosition+maxSize/2, yPosition-maxSize/4);
+        vertex(xPosition+maxSize/2, yPosition+maxSize/5);
+        vertex(xPosition+maxSize/4, yPosition+maxSize/5);
+        vertex(xPosition+maxSize/4, yPosition+maxSize/2);
+        vertex(xPosition-maxSize/4, yPosition+maxSize/2);
+        vertex(xPosition-maxSize/4, yPosition+maxSize/5);
+        vertex(xPosition-maxSize/2, yPosition+maxSize/5);
+        endShape(CLOSE);
+        break;
+      case 3:
+        // S
+        beginShape();
+        vertex(xPosition+maxSize/2, yPosition-maxSize/4);
+        vertex(xPosition+maxSize/2, yPosition);
+        vertex(xPosition+maxSize/5, yPosition);
+        vertex(xPosition+maxSize/5, yPosition+maxSize/4);
+        vertex(xPosition-maxSize/2, yPosition+maxSize/4);
+        vertex(xPosition-maxSize/2, yPosition);
+        vertex(xPosition-maxSize/5, yPosition);
+        vertex(xPosition-maxSize/5, yPosition-maxSize/4);
+        endShape(CLOSE);
+        break;
+      case 4:
+        // Z
+        beginShape();
+        vertex(xPosition-maxSize/2, yPosition-maxSize/4);
+        vertex(xPosition-maxSize/2, yPosition);
+        vertex(xPosition-maxSize/5, yPosition);
+        vertex(xPosition-maxSize/5, yPosition+maxSize/4);
+        vertex(xPosition+maxSize/2, yPosition+maxSize/4);
+        vertex(xPosition+maxSize/2, yPosition);
+        vertex(xPosition+maxSize/5, yPosition);
+        vertex(xPosition+maxSize/5, yPosition-maxSize/4);
+        endShape(CLOSE);
+        break;
+      case 5:
+        // L
+        beginShape();
+        vertex(xPosition-maxSize/4, yPosition-maxSize/2);
+        vertex(xPosition, yPosition-maxSize/2);
+        vertex(xPosition, yPosition+maxSize/4);
+        vertex(xPosition+maxSize/4, yPosition+maxSize/4);
+        vertex(xPosition+maxSize/4, yPosition+maxSize/2);
+        vertex(xPosition-maxSize/4, yPosition+maxSize/2);
+        endShape(CLOSE);
+        break;
+      case 6:
+        // J
+        beginShape();
+        vertex(xPosition+maxSize/4, yPosition-maxSize/2);
+        vertex(xPosition, yPosition-maxSize/2);
+        vertex(xPosition, yPosition+maxSize/4);
+        vertex(xPosition-maxSize/4, yPosition+maxSize/4);
+        vertex(xPosition-maxSize/4, yPosition+maxSize/2);
+        vertex(xPosition+maxSize/4, yPosition+maxSize/2);
+        endShape(CLOSE);
+        break;
+      }
     }
   }
 

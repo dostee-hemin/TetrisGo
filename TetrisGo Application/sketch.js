@@ -28,7 +28,7 @@ let isDoingTutorial = false;
 // This is the starting point of the program. 
 // It manages setting up the scene, loading data, and other initial preparations.
 function setup() {  
-  createCanvas(1300, 800);
+  createCanvas(1260, 700);
 
   // Load the info about the songs
   loadSongsInfo();
@@ -38,6 +38,8 @@ function setup() {
 
   // Call the setup function for the tetris part of the application
   setupTetrisPart();
+
+  setupAnimationPart();
 }
 
 
@@ -51,18 +53,15 @@ function setup() {
 // and it is what we use to display and update the game
 function draw() {
   switch(gameState) {
-    // Main Menu
     case "Main Menu":
       mainMenu();
       break;
-    // Game Scene
     case "Game Scene":
       gameScene();
       break;
     case "Game Over":
       gameOver();
       break;
-    // Adjust Camera
     case "Adjust Camera":
       adjustCamera();
       break;
@@ -76,6 +75,8 @@ function draw() {
       levelCompleted();
       break;
   }
+
+  showTransition();
 }
 
 
@@ -184,14 +185,16 @@ function selectSong() {
   textSize(50);
   text("Tutorial", width/2-150,height-45);
 
+  imageMode(CORNER);
   for(var i=0; i<4; i++) {
     for(var j=0; j<3; j++) {
+      var index = i+j*4;
+      
+      // If we have displayed all the songs that exist, leave the loop
+      if(index >= songs.length) continue;
+
       var x = 50+i*iconSize*1.25;
       var y = 150+j*iconSize*1.25;
-
-      var index = i+j*4;
-
-      if(index >= songs.length) continue;
 
       // Display picture
       noStroke();
@@ -230,19 +233,29 @@ function selectSong() {
         if(canPickSong) {
           chosenSong = index;
 
+          // If the user chose to do the tutorial, enter the tutorial scene
           if(isDoingTutorial) {
             startSecond = millis()/1000;
             gameState = "Tutorial";
-            mappedPieces = tutorialPieces;
+
+            // Load the tutorial pieces into the game
+            for(var x=0; x<tutorialPieces.length; x++) {
+              mappedPieces[x] = {time: tutorialPieces[x].time, type: tutorialPieces[x].type};
+            }
             return;
           }
 
+          // At this point, the user is not doing the tutorial, so directly enter the game
           gameState = "Game Scene";
           countdownStart = millis();
           mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
         }
       }
-      else stroke(200);
+      else {
+        // Highlight selected song
+        stroke(200);
+      }  
+      // Display the outline of the song icon
       strokeWeight(10);
       noFill();
       rectMode(CORNER);
@@ -298,6 +311,10 @@ function gameScene() {
     songs[chosenSong].music.play(startDelay);
   }
   
+  // If we have reached the end of the song, the level has been completed so move on to the level completion scene
+  if(millis()/1000 > startSecond+startDelay+songs[chosenSong].music.duration()) {
+    gameState = "Level Completed";
+  }
 
   updateGameElements();
 }
@@ -311,10 +328,12 @@ function tutorialScene() {
     line(0,y,width,y);
   }
 
+  // Display what the pose detector sees and the upcoming pieces
   displayPoseElements();
   displayTetrisElements();
   updateGameElements();
 
+  // For the first few seconds in the tutorial, display some text indicating when to pose properly
   if(startSecond + startDelay - millis()/1000 > -1.5) {
     fill(255);
     textSize(25);
@@ -322,6 +341,7 @@ function tutorialScene() {
     noStroke();
     text("When the piece comes here,\nmake the correct pose", 170, 50+acceptanceAmount/2);
 
+    // Arrow pointing to the middle of the acceptance zone
     stroke(255);
     strokeWeight(5);
     line(340,50+acceptanceAmount/2,390,50+acceptanceAmount/2);
@@ -329,6 +349,7 @@ function tutorialScene() {
     line(365,75+acceptanceAmount/2,390,50+acceptanceAmount/2);
   }
   
+  // If there are pieces coming, display the correct pose image that represents the current piece
   if(mappedPieces.length != 0) {
     if(abs((mappedPieces[0].time + startSecond + startDelay)-millis()/1000) < poseTime-0.3) {
       imageMode(CENTER);
@@ -336,6 +357,7 @@ function tutorialScene() {
     }
   }
 
+  // If we have finished the tutorial, enter the game scene
   if(millis()/1000 > startSecond+40) {
     gameState = "Game Scene";
     countdownStart = millis();
@@ -370,10 +392,6 @@ function gameOver() {
   // Restart
   fill(200);
   text("Press 'r' to restart", width/2, height/2+350);
-}
-
-function winTheGame() {
-  gameState = "Level Completed";
 }
 
 function levelCompleted() {

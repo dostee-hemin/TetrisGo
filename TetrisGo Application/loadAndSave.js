@@ -71,7 +71,6 @@ function loadSongsInfo() {
         cover: loadImage('assets/Cover Images/'+songs[i].name+' Cover.png'),
         name: songs[i].name,
         difficulty: songs[i].difficulty};
-      songs[i].music.onended(winTheGame);
     }
   
     // Bubble sort the songs based on difficulty in ascending order

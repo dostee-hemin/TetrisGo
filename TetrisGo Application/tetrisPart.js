@@ -44,7 +44,6 @@ let lineCount = 0;              // Number of lines cleared in total
 let highScoreLineCount = 0;     // Best number of line clears
 let score = 0;                  // Score of the game
 let highScore = 0;              // Best score of the game
-let highscoreTxt;
 
 // The weights of each attribute used in determining the optimum piece placement
 let costWeights = [0.87,3.54,0.99,1.48,2.49,1.87];
@@ -156,7 +155,7 @@ function rotatePiece(dir, tetromino) {
   // If the current tetromino is an O piece, there's no need to calculate a rotation so just leave the function
   if (currentTetrominoType == 0) return tetromino;
 
-  // This is a duplicate of the current tetromino so that we can confirm first if moving down is possible
+  // This is a duplicate of the current tetromino so that we can confirm first if rotating is possible
   let futureTetromino = duplicateTetromino(tetromino);
 
   // Loop through every box in the tetromino that's not the center (not at index 0)
@@ -254,8 +253,10 @@ function checkLines() {
   }
 
   // Play the correct sound based on the number of lines cleared
-  if(numberOfClears == 4) playSound(tetrisSound);
-  else if(numberOfClears > 0) playSound(lineclearSound);
+  if(gameScene != "Tutorial") {
+    if(numberOfClears == 4) playSound(tetrisSound);
+    else if(numberOfClears > 0) playSound(lineclearSound);
+  }
 
   // Based on the number of lines cleared, increase the score
   switch(numberOfClears) {
@@ -319,7 +320,7 @@ function dropTetromino(type, isScrambled) {
   // If the piece should be scrambled, create 4 random boxes for the tetromino
   if(isScrambled) createScrambledTetromino();
   // If the piece should not be scrambled, create an ordinary tetromino from the piece type
-  else createTetrominoFromType(type);
+  else createTetrominoFromType(currentTetromino, type);
 
   findOptimumPiecePlacement();
   moveTetrominoToOptimumPosition();
@@ -415,91 +416,91 @@ function createScrambledTetromino() {
   maximumNumberOfRotations = 4;
 }
 
-function createTetrominoFromType(type) {
+function createTetrominoFromType(tetromino, type) {
   // Based on the type of the piece, generate the tetromino
   switch (type) {
     // O piece
     case 0:
-      currentTetromino[0][0] = 4;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 5;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 4;
-      currentTetromino[2][1] = 1;
-      currentTetromino[3][0] = 5;
-      currentTetromino[3][1] = 1;
+      tetromino[0][0] = 4;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 5;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 4;
+      tetromino[2][1] = 1;
+      tetromino[3][0] = 5;
+      tetromino[3][1] = 1;
       maximumNumberOfRotations = 1;
       break;
     // I piece
     case 1:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 3;
-      currentTetromino[2][1] = 0;
-      currentTetromino[3][0] = 6;
-      currentTetromino[3][1] = 0;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 3;
+      tetromino[2][1] = 0;
+      tetromino[3][0] = 6;
+      tetromino[3][1] = 0;
       maximumNumberOfRotations = 2;
       break;
     // T piece
     case 2:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 6;
-      currentTetromino[2][1] = 0;
-      currentTetromino[3][0] = 5;
-      currentTetromino[3][1] = 1;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 6;
+      tetromino[2][1] = 0;
+      tetromino[3][0] = 5;
+      tetromino[3][1] = 1;
       maximumNumberOfRotations = 4;
       break;
     // S piece
     case 3:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 1;
-      currentTetromino[2][0] = 6;
-      currentTetromino[2][1] = 0;
-      currentTetromino[3][0] = 5;
-      currentTetromino[3][1] = 1;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 1;
+      tetromino[2][0] = 6;
+      tetromino[2][1] = 0;
+      tetromino[3][0] = 5;
+      tetromino[3][1] = 1;
       maximumNumberOfRotations = 2;
       break;
     // Z piece
     case 4:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 6;
-      currentTetromino[2][1] = 1;
-      currentTetromino[3][0] = 5;
-      currentTetromino[3][1] = 1;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 6;
+      tetromino[2][1] = 1;
+      tetromino[3][0] = 5;
+      tetromino[3][1] = 1;
       maximumNumberOfRotations = 2;
       break;
     // L piece
     case 5:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 4;
-      currentTetromino[2][1] = 1;
-      currentTetromino[3][0] = 6;
-      currentTetromino[3][1] = 0;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 4;
+      tetromino[2][1] = 1;
+      tetromino[3][0] = 6;
+      tetromino[3][1] = 0;
       maximumNumberOfRotations = 4;
       break;
     // J piece
     case 6:
-      currentTetromino[0][0] = 5;
-      currentTetromino[0][1] = 0;
-      currentTetromino[1][0] = 4;
-      currentTetromino[1][1] = 0;
-      currentTetromino[2][0] = 6;
-      currentTetromino[2][1] = 1;
-      currentTetromino[3][0] = 6;
-      currentTetromino[3][1] = 0;
+      tetromino[0][0] = 5;
+      tetromino[0][1] = 0;
+      tetromino[1][0] = 4;
+      tetromino[1][1] = 0;
+      tetromino[2][0] = 6;
+      tetromino[2][1] = 1;
+      tetromino[3][0] = 6;
+      tetromino[3][1] = 0;
       maximumNumberOfRotations = 4;
       break;
   }
@@ -575,12 +576,9 @@ function findOptimumPiecePlacement() {
       let currentSimulationTetromino = duplicateTetromino(startingPlacement);
 
       // Move over the piece to the current simulation column
-      let maxX = 0;
       for (let j = 0; j < currentColumn; j++) {
         for (let k = 0; k < 4; k++) {
           currentSimulationTetromino[k][0]++;
-          if(currentSimulationTetromino[k][0] == cols-1) {
-          }
         }
       }
       

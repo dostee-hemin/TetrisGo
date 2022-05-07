@@ -11,7 +11,6 @@
 
 
 
-
 /*-------------------- Variables -------------------*/
 let video;                // The p5 DOM element representing the webcam feed
 let armPoints = [];       // The list of pose keypoints that make up the left and right arm of the current pose 
@@ -22,7 +21,6 @@ let label = "waiting";
 
 // This array contains all the possible pose labels that could come out of the model
 let allLabels = ["O", "I", "T", "S", "Z", "L", "J"];
-
 
 
 
@@ -64,7 +62,7 @@ function setupPoseDetectionPart() {
     width: 640,
     height: 480
   });
-  camera.start();
+  // camera.start();
 
   // Disable the HTML video element so that it doesn't interfere with our p5 sketch
   videoElement.style.display = "none";

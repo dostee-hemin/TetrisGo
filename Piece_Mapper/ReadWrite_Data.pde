@@ -26,6 +26,9 @@ void LoadInfo() {
     String[] txt = loadStrings("Text Data/beats info.txt");
     bpm = float(split(txt[0], "= ")[1]);
     beatOffset = float(split(txt[1], "= ")[1]);
+    beatPrecision = constrain(beatPrecision, 1, 16);
+    pixelsPerBeat = pixelsPerSecond / (bpm/60);
+    pixelsPerPrecision = pixelsPerBeat / beatPrecision;
   } 
   catch (NullPointerException e) {
     println("No beat info loaded!");

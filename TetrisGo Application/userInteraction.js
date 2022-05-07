@@ -4,20 +4,21 @@ function keyPressed() {
     switch(gameState) {
       case "Main Menu":
         // In the main menu, if the user presses the enter key, move on to adjusting the camera
-        if(keyCode == RETURN) gameState = "Adjust Camera";
+        if(keyCode == RETURN) makeTransition("Adjust Camera");
         break;
       case "Game Scene":
       case "Game Over":
       case "Level Completed":
+      case "Tutorial":
         // If the user presses the r key, reset the game
         if(key == 'r') {
-          setupTetrisPart();
-          gameState = "Select Song";
+          songs[chosenSong].music.stop();
+          makeTransition("Select Song");
         }
         break;
       case "Adjust Camera":
         // In the adjust camera panel, if the user presses the enter key, start the tetris game
-        if(keyCode == RETURN) gameState = "Select Song";
+        if(keyCode == RETURN) makeTransition("Select Song");
         break;
     }
   }
