@@ -21,7 +21,7 @@
 let transGrid = [];                 // The grid used for the transition
 let transScl = 70;                  // The scale (in pixels) of each cell in the transition grid
 let transCols, transRows;           // The dimensions of the transition grid (columns and rows)
-let transExtra = 4;                 // Extra amount of columns and rows added to the transition grid to fill any holes
+let transExtra = 8;                 // Extra amount of columns and rows added to the transition grid to fill any holes
 let destinationScene;               // Represents the game state we want to transition to
 let transitionPieces = [];          // Stores the pieces that will cover the screen in the transition
 let currentTransitionPiece = 0;     // Stores how far in the transition we are
@@ -175,13 +175,14 @@ function makeTransition(scene) {
     // Set the scene we want to transition into using the given scene
     destinationScene = scene;
 
+    var currentIteration = 0;
     
     // Continuously add new pieces to the grid (we will break out of the loop later)
     while (true) {
         // Variables to find the best location to drop a piece
         var recordCost = 1000000;
         var bestRotation = 0;
-        var bestPiece = [];
+        var bestPiece;
 
         // Pick a random piece type
         var type = floor(random(7));
@@ -390,6 +391,8 @@ function makeTransition(scene) {
             }
         }
 
+        // If we have not found any possible placements, move on to the next piece
+        if(bestPiece == null) continue;
 
         // At this point, we have found the best place to put the current piece, so add it to the list of pieces
         transitionPieces.push(new TransitionPiece(bestPiece, type, bestRotation));
@@ -490,7 +493,7 @@ class TransitionPiece {
 
         // Black outline
         stroke(0);
-        strokeWeight(3);
+        strokeWeight(5);
 
         push();
         translate(this.center.x, this.center.y);
