@@ -26,7 +26,14 @@ let destinationScene;               // Represents the game state we want to tran
 let transitionPieces = [];          // Stores the pieces that will cover the screen in the transition
 let currentTransitionPiece = 0;     // Stores how far in the transition we are
 let isTransitioning;                // Boolean that determines whether or not we should show the transition animation
-var isShrinking;                    // Boolean that determines whether we should grow or shrink the transition pieces
+let isShrinking;                    // Boolean that determines whether we should grow or shrink the transition pieces
+
+//------ For the main menu
+let logoSize = 0;                   // The scale of the logo (between 0 and 1)
+let promptSize = 0;                 // The scale of the prompt (between 0 and 1)
+let prompt = "Press 'Enter'";       // The actual prompt
+let promptOffsets = [];             // The y offsets of each of the prompt characetrs
+let rainEffect;                     // The particle system for creating a rain effect
 
 
 
@@ -43,8 +50,97 @@ function setupAnimationPart() {
     // Assign the columns and rows according to the width and height of the canvas
     transCols = floor(width / transScl) + transExtra;
     transRows = floor(height / transScl) + transExtra;
+
+    // Initialize all of the prompt offsets to 0
+    for(var i=0; i<prompt.length; i++) promptOffsets[i] = 0;
+
+    // Initialize the rain effect manager
+    rainEffect = new RainEffect();
 }
 
+
+
+
+
+
+
+
+
+
+/*-------------------- Main Menu -------------------*/
+
+// Class that controls falling pieces to create a rain effect
+class RainEffect {
+    // Create an empty array that will contain out falling pieces
+    constructor() {
+        this.fallingPieces = [];
+    }
+
+    // Loop through every piece in the array and display it
+    display() {
+        for (const piece in this.fallingPieces) piece.display();
+    }
+
+    update() {
+        // Every frame, there's a random chance of adding a new falling piece
+        if(random(1) < 0.05) this.fallingPieces.push(new FallingPiece());
+
+        // Loop through all the falling pieces
+        for(var i=this.fallingPieces.length-1; i>=0; i--) {
+            var piece = this.fallingPieces[i];
+
+            // Update the current piece
+            piece.update();
+
+            // If the piece has reached the bottom of the screen, remove it from the array
+            if(piece.isFinished()) this.fallingPieces.splice(i, 1);
+        }
+    }
+}
+
+// Class that represents a falling piece for the rain effect
+class FallingPiece {
+    constructor() {
+        // Set the location of the piece to a random horizontal position above the screen
+        this.x = random(width);
+        this.y = -50;
+
+        // Give the piece a random rotation, type, and speed
+        this.rotation = floor(random(4));
+        this.type = floor(random(7));
+        this.speed = random(3,7);
+
+        // Set the frame this piece is created to the current frame
+        this.startingFrame = frameCount;
+
+        // Set the size according to the speed of the piece (to create a parralax effect)
+        this.size = this.speed * 5;
+    }
+
+    display() {
+        // Display the piece shape with the correct rotation
+        push();
+        translate(this.x,this.y);
+        for(var i=0; i<this.rotation; i++) rotate(HALF_PI);
+        noStroke();
+        colorFromType(this.type+1);
+        drawPieceShape(this.type,0,0,this.size);
+        pop();
+    }
+
+    update() {
+        // Every couple of frames, rotate the piece
+        if((frameCount - this.startingFrame) % 40 == 0) (this.rotation++)%4;
+
+        // Move the piece down by the speed
+        this.y += this.speed;
+    }
+
+    // Returns true if the piece has reached the bottom of the screen
+    isFinished() {
+        return this.y > height+200;
+    }
+}
 
 
 

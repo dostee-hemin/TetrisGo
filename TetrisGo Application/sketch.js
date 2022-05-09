@@ -91,19 +91,58 @@ function draw() {
 // Function that is called when we are in the main menu
 function mainMenu() {
   // Set a solid background color
-  background(0,40,120);
+  background(255);
 
-  // Display blinking text
-  fill(255,0,0);
-  textSize(100);
+  // After we have shown the prompt, start adding and updating pieces in the rain effect
+  if(promptSize > 0.95) rainEffect.update();
+  rainEffect.display();
+
+  // Draw the logo with the proper scale and rotation
+  push();
+  translate(width/2-20,height/2);
+  rotate(logoSize*HALF_PI-HALF_PI);
+  scale(logoSize);
+  tint(0);
+  imageMode(CENTER);
+  image(logoImage, 7,7);
+  noTint();
+  image(logoImage, 0,0);
+  pop();
+  
+  // Draw the prompt that asks the user to press enter
+  push();
+  translate(width/2, height-50);
+  scale(promptSize);
   textAlign(CENTER);
-  if(int(frameCount/30)%2 == 0) {
-    // If the model is not yet loaded, display a "waiting" text
-    if(armPoints == null) text("Waiting for model to load...", width/2, height/2);
+  strokeWeight(5);
+  fill(0,255,255);
+  stroke(0,100,100);
 
-    // If the model is loaded, display a "press start" text
-    else text("Press start!", width/2, height/2);
+  // Loop through all the characters in the prompt string
+  for(var i=0; i<promptOffsets.length; i++) {
+    // Get the current position and character
+    var x = -(promptOffsets.length/2*25) + i*25;
+    var y = -promptOffsets[i];
+    var c = prompt.charAt(i);
+
+    // Display the character
+    textSize(40);
+    text(c,x,y);
+
+    // Calculate where the current position of the wave is (between 0 and the length of the prompt)
+    var wavePosition = (frameCount%90)/90 * promptOffsets.length;
+
+    // If the current character is withing a short distance of the wave position, make it rise, if not, make it fall
+    var target = 0;
+    if(abs(i-wavePosition) < 1) target = 30;
+    promptOffsets[i] = lerp(promptOffsets[i], target, 0.1);
   }
+  pop();
+
+  // Grow the logo and the prompt in size
+  logoSize = lerp(logoSize, 1, 0.1);
+  if(logoSize > 0.98) promptSize = lerp(promptSize, 1, 0.1);
+
 }
 
 

@@ -17,6 +17,7 @@ let tetrisSound;                    // When 4 lines are cleared
 let gameoverSound;                  // When the player tops out
 
 let poseImages = [];
+let logoImage;
 
 
 
@@ -49,6 +50,8 @@ function preload() {
     poseImages[4] = loadImage("assets/Images/Z.jpg");
     poseImages[5] = loadImage("assets/Images/L.jpg");
     poseImages[6] = loadImage("assets/Images/J.jpg");
+
+    logoImage = loadImage("assets/Images/Logo.png");
 }
 
 function setupHighScore() {
