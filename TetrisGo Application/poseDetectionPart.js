@@ -14,6 +14,7 @@
 /*-------------------- Variables -------------------*/
 let video;                // The p5 DOM element representing the webcam feed
 let armPoints = [];       // The list of pose keypoints that make up the left and right arm of the current pose 
+let keypoints = [];       // The list of all the pose keypoints in the prediction
 
 // The label of the model's prediction 
 // (by default it's set to waiting until the model comes online)
@@ -62,7 +63,7 @@ function setupPoseDetectionPart() {
     width: 640,
     height: 480
   });
-  // camera.start();
+  camera.start();
 
   // Disable the HTML video element so that it doesn't interfere with our p5 sketch
   videoElement.style.display = "none";
@@ -82,6 +83,13 @@ function predict(results) {
   // The keypoints in the current pose
   let points = results.poseLandmarks;
   if(points == null) return;
+
+  // Set all the keypoints to the landmarks we just found
+  keypoints = [];
+  for(var i=0; i<points.length; i++) {
+    if(points[i].x < 0 || points[i].x > 1 || points[i].y < 0 || points[i].y > 1) continue;
+    keypoints.push({x: (1-points[i].x)*video.width, y: points[i].y*video.height});
+  }
 
   // Set all the arm keypoints according to pose (each armPoint is an (x, y) coordinate)
   // (leftShoulder, leftElbow, leftWrist, rightShoulder, rightElbow, rightWrist)
@@ -107,7 +115,7 @@ function predict(results) {
   else if(isInPosition([0,1,2,3])) label = "S";
   else if(isInPosition([0,0,1,4])) label = "L";
   else if(isInPosition([1,4,2,2])) label = "J";
-  else label = "";
+  else label = "Nothing";
 }
 
 

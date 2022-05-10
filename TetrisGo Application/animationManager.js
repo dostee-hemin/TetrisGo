@@ -174,8 +174,6 @@ function makeTransition(scene) {
 
     // Set the scene we want to transition into using the given scene
     destinationScene = scene;
-
-    var currentIteration = 0;
     
     // Continuously add new pieces to the grid (we will break out of the loop later)
     while (true) {
@@ -393,6 +391,9 @@ function makeTransition(scene) {
 
         // If we have not found any possible placements, move on to the next piece
         if(bestPiece == null) continue;
+
+        // To fix overlapping bug
+        if(lands(bestPiece)) continue;
 
         // At this point, we have found the best place to put the current piece, so add it to the list of pieces
         transitionPieces.push(new TransitionPiece(bestPiece, type, bestRotation));
