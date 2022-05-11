@@ -3,7 +3,6 @@
   Setup                   (initial setup of the program that is run once at the start)
   Draw                    (continuous loop that is run every frame)
   Game States             (the different stages of the program)
-  User Interaction        (manages user input like key presses and mouse clicks)
 */
 
 
@@ -20,6 +19,7 @@ let isDoingTutorial = false;      // Determines whether or not the player would 
 
 let showKeypoints = false;        // Determines whether or not we should show the keypoints of the predictions
 let showArms = false;             // Determines whether or not we should show the arm segments of the predictions
+let switchPosition = {x1: 0, x2: 0};
 let framerateLogs = [];           // Stores a bunch of framerate values to display as a graph
 
 
@@ -33,6 +33,10 @@ let framerateLogs = [];           // Stores a bunch of framerate values to displ
 // It manages setting up the scene, loading data, and other initial preparations.
 function setup() {
   createCanvas(1260, 700);
+
+  // Initialize the toggle switch positions
+  switchPosition.x1 = width - width / 8 - 50;
+  switchPosition.x2 = switchPosition.x1;
 
   // Load the info about the songs
   loadSongsInfo();
@@ -81,6 +85,11 @@ function draw() {
   }
 
   showTransition();
+
+  // Add a new framerate to the list of logs
+  framerateLogs.push(round(frameRate()));
+  // If the number of logs gets too large, remove the oldest log
+  if (framerateLogs.length > 200) framerateLogs.shift();
 }
 
 
@@ -119,8 +128,8 @@ function mainMenu() {
   scale(promptSize);
   textAlign(CENTER);
   strokeWeight(5);
-  fill(0, 255, 255);
-  stroke(0, 100, 100);
+  fill(98, 176, 245);
+  stroke(0);
 
   // Loop through all the characters in the prompt string
   for (var i = 0; i < promptOffsets.length; i++) {
@@ -249,10 +258,12 @@ function adjustCamera() {
   noStroke();
   var x = width - width / 8 - 50;
   if (showKeypoints) x += 100;
-  rect(x, height / 3 + 50, 100, 50);
+  switchPosition.x1 = lerp(switchPosition.x1, x, 0.2);
+  rect(switchPosition.x1, height / 3 + 50, 100, 50);
   x = width - width / 8 - 50;
   if (showArms) x += 100;
-  rect(x, height / 2 + 100, 100, 50);
+  switchPosition.x2 = lerp(switchPosition.x2, x, 0.2);
+  rect(switchPosition.x2, height / 2 + 100, 100, 50);
 
   // Get the index in the allLabels array that the current prediction is located
   let indexOfLabel = allLabels.indexOf(label);
@@ -272,11 +283,6 @@ function adjustCamera() {
   // Display the current framerate
   fill(0);
   text(round(frameRate()), width / 8, height / 2 + 110);
-
-  // Add a new framerate to the list of logs
-  framerateLogs.push(round(frameRate()));
-  // If the number of logs gets too large, remove the oldest log
-  if (framerateLogs.length > 200) framerateLogs.shift();
 
   // Create the graph from the list of framerate logs
   fill(0, 255, 0, 100);

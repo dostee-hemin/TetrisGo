@@ -452,24 +452,24 @@ function showTransition() {
     if (!isTransitioning) return;
 
     // Keep showing more and more pieces
-    currentTransitionPiece++;
+    if(frameCount % 3 == 0) currentTransitionPiece += isShrinking ? -1 : 1;
 
     // If we have shown all the pieces, start shrinking the pieces
-    if (currentTransitionPiece > transitionPieces.length + 30) {
+    if (!isShrinking && currentTransitionPiece > transCols/1.2) {
         // Change to the scene that we wanted to transition to
-        if (!isShrinking) {
-            isShrinking = true;
-            gameState = destinationScene;
-        }
-        // End of the animation
-        else isTransitioning = false;
-
-        currentTransitionPiece = 0;
-    }
+        isShrinking = true;
+        gameState = destinationScene;
+    } else if(currentTransitionPiece < 0) isTransitioning = false;
 
     // Loop through all the pieces in the list and update and display them
     for (var i = 0; i < transitionPieces.length; i++) {
-        if (i < currentTransitionPiece) transitionPieces[i].update();
+        var d = dist(transitionPieces[i].center.x,transitionPieces[i].center.y, width/2, height/2);
+        
+        if(isShrinking) {
+            if (d > currentTransitionPiece*transScl) transitionPieces[i].update();
+        } else {
+            if (d < currentTransitionPiece*transScl) transitionPieces[i].update();
+        }
         transitionPieces[i].display();
     }
 }

@@ -63,7 +63,7 @@ function setupPoseDetectionPart() {
     width: 640,
     height: 480
   });
-  camera.start();
+  // camera.start();
 
   // Disable the HTML video element so that it doesn't interfere with our p5 sketch
   videoElement.style.display = "none";
