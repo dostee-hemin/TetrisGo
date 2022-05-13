@@ -16,9 +16,8 @@ let lineclearSound;                 // When 1-3 lines are cleared
 let tetrisSound;                    // When 4 lines are cleared
 let gameoverSound;                  // When the player tops out
 
-let poseImages = [];
-let logoImage;
-
+let poseImages = [];                // Contains the images used in the tutorial to show how to pose
+let logoImage;                      // Contains the image of the game logo
 
 
 
@@ -63,19 +62,14 @@ function setupHighScore() {
 function loadSongsInfo() {
     // Here is where you add new songs to the list.
     // Every element needs the name of the song and the difficulty
-    songs[0] = {name: "Tetris Theme", difficulty:2};
-    songs[1] = {name: "Beggin'", difficulty:1};
-    songs[2] = {name: "Ah Yani", difficulty:0};
-  
-    // Loop through all songs and load their music and cover images
-    for(var i=0; i<songs.length; i++) {
-      songs[i] = {
-        music: loadSound('assets/Songs/' + songs[i].name + ' Song.mp3'),
-        cover: loadImage('assets/Cover Images/'+songs[i].name+' Cover.png'),
-        name: songs[i].name,
-        difficulty: songs[i].difficulty};
-    }
-  
+    songs.push(new Card("Tetris Theme", 2));
+    songs.push(new Card("Beggin'", 1));
+    songs.push(new Card("Ah Yani", 0));
+    songs.push(new Card("Dance Monkey", 0));
+    songs.push(new Card("Zumba", 1));
+    songs.push(new Card("Khappa Gyan Bukhom", 0));
+    songs.push(new Card("Gangnam Style", 1));
+
     // Bubble sort the songs based on difficulty in ascending order
     for(var i=0; i<songs.length-1; i++) {
       for(var j=0; j<songs.length-1-i; j++) {
@@ -85,6 +79,13 @@ function loadSongsInfo() {
           songs[j+1] = temp;
         }
       }
+    }
+  
+    // Loop through all songs and load their music and cover images
+    for(var i=0; i<songs.length; i++) {
+      songs[i].setAssets(
+        loadSound('assets/Songs/' + songs[i].name + ' Song.mp3'),
+        loadImage('assets/Cover Images/'+songs[i].name+' Cover.png'));
     }
 }
   

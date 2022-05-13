@@ -35,6 +35,12 @@ let prompt = "Press 'Enter'";       // The actual prompt
 let promptOffsets = [];             // The y offsets of each of the prompt characetrs
 let rainEffect;                     // The particle system for creating a rain effect
 
+//------ For the select song menu
+let startCardX = 0;                 // Used for moving the cards left and right
+let lerpCardX = 0;                  // Used for creating a smooth transition when moving the cards left and right
+let cardWidth = 250;                // Width of the card (in pixels)    
+let cardHeight = 400;               // Height of the card (in pixels)
+
 
 
 
@@ -56,6 +62,9 @@ function setupAnimationPart() {
 
     // Initialize the rain effect manager
     rainEffect = new RainEffect();
+
+    startCardX = width/2 - cardWidth*1.1;
+    lerpCardX = startCardX;
 }
 
 
@@ -142,6 +151,100 @@ class FallingPiece {
     }
 }
 
+
+
+
+
+
+
+
+/*-------------------- Select Song -------------------*/
+
+// This class stores the information on each song and will display it properly in the select song menu
+class Card {
+    constructor(name, difficulty) {
+        // Set the x and y points, as well as where the y should be
+        this.x = 0;
+        this.y = height/2+50;
+        this.targetY = this.y;
+
+        // Set the name and difficulty to the values given
+        this.name = name;
+        this.difficulty = difficulty;
+
+        // Declare that we will also store the music and cover
+        this.music;
+        this.cover;
+    }
+
+    // Assign the music and cover variables to the values given
+    setAssets(music, cover) {
+        this.music = music;
+        this.cover = cover;
+    }
+
+    // Display the card at a given x value
+    display(x) {
+        this.x = x;
+        
+        // Based on the difficulty, color the card either green, yellow, or red
+        switch(this.difficulty) {
+            case 0:
+                fill(0,255,0);
+                stroke(0,175,0);
+                break;
+            case 1:
+                fill(255,255,0);
+                stroke(175,175,0);
+                break;
+            case 2:
+                fill(255,0,0);
+                stroke(175,0,0);
+                break;
+        }
+        strokeWeight(10);
+        rectMode(CENTER);
+        rect(this.x,this.y,cardWidth,cardHeight,15);
+
+        // Display the cover image of the song
+        imageMode(CENTER);
+        image(this.cover, this.x,this.y-cardHeight/2+cardWidth/2, cardWidth*0.9, cardWidth*0.9);
+        noFill();
+        stroke(0);
+        strokeWeight(5);
+        rect(this.x,this.y-cardHeight/2+cardWidth/2, cardWidth*0.9, cardWidth*0.9, 5);
+
+        // Display the name of the music, with each word being shown on a separate line
+        fill(0);
+        textSize(40);
+        noStroke();
+        textAlign(CENTER);
+        var words = this.name.split(" ");
+        for(var i=0; i<words.length; i++) {
+            text(words[i],this.x,this.y+76+i*40);
+        }
+
+        // Move the card's y position to where it should be
+        this.y = lerp(this.y,this.targetY,0.1);
+    }
+
+    // Return's true if the mouse hovers over the card and is within the boundaries of the left and right move buttons
+    isUnderMouse() {
+        return mouseInRect(this.x-cardWidth/2,this.x+cardWidth/2,this.y-cardHeight/2,this.y+cardHeight/2) &&
+               mouseX > width/2-cardWidth*1.1*1.5 && mouseX < width/2+cardWidth*1.1*1.5;
+    }
+
+    // Returns true if the card is currently levitating
+    isPressed() {
+        return this.targetY == height/2-20;
+    }
+
+    // Function that makes the card rise and fall
+    interactWithMouse() {
+        if(this.isUnderMouse()) this.targetY = height/2-20;
+        else this.targetY = height/2+50;
+    }
+}
 
 
 

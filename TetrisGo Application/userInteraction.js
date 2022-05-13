@@ -1,55 +1,82 @@
 /*-------------------- User Interaction -------------------*/
 // Function that is called when the user presses a key
 function keyPressed() {
-    switch(gameState) {
-      case "Main Menu":
-        // In the main menu, if the user presses the enter key, move on to adjusting the camera
-        if(keyCode == RETURN) makeTransition("Adjust Camera");
-        break;
-      case "Game Scene":
-      case "Game Over":
-      case "Level Completed":
-      case "Tutorial":
-        // If the user presses the r key, reset the game
-        if(key == 'r' || key == 'R') {
-          songs[chosenSong].music.stop();
-          makeTransition("Select Song");
+  switch (gameState) {
+    case "Main Menu":
+      // In the main menu, if the user presses the enter key, move on to adjusting the camera
+      if (keyCode == RETURN) makeTransition("Adjust Camera");
+      break;
+    case "Game Scene":
+    case "Game Over":
+    case "Level Completed":
+    case "Tutorial":
+      // If the user presses the r key, reset the game
+      if (key == 'r' || key == 'R') {
+        songs[chosenSong].music.stop();
+        makeTransition("Select Song");
+      }
+      break;
+    case "Adjust Camera":
+      // In the adjust camera panel, if the user presses the enter key, start the tetris game
+      if (keyCode == RETURN) makeTransition("Select Song");
+      break;
+    case "Select Song":
+      // Go back to the camera adjustment panel
+      if (key == 'c' || key == 'C') makeTransition("Adjust Camera");
+      break;
+  }
+}
+
+// Function that is called when the user presses the mouse
+function mousePressed() {
+  switch (gameState) {
+    case "Adjust Camera":
+      // Toggle switches for showing the keypoints and arms
+      if (mouseInRect(width - width / 8 - 100, width - width / 8 + 100, height / 3 + 25, height / 3 + 75)) showKeypoints = !showKeypoints;
+      if (mouseInRect(width - width / 8 - 100, width - width / 8 + 100, height / 2 + 75, height / 2 + 125)) showArms = !showArms;
+      break;
+    case "Select Song":
+      // Moving the cards
+      if (songs.length > 3) {
+        if (dist(mouseX, mouseY, 60, height / 2) < 30) {
+          startCardX += cardWidth * 1.1;
+        } else if (dist(mouseX, mouseY, width - 60, height / 2) < 30) {
+          startCardX -= cardWidth * 1.1;
         }
-        break;
-      case "Adjust Camera":
-        // In the adjust camera panel, if the user presses the enter key, start the tetris game
-        if(keyCode == RETURN) makeTransition("Select Song");
-        break;
-      case "Select Song":
-        // Go back to the camera adjustment panel
-        if(key == 'c' || key == 'C') makeTransition("Adjust Camera");
-        break;
-    }
+        startCardX = constrain(startCardX, width / 2 - cardWidth * 1.1 * (songs.length - 2), width / 2 - cardWidth * 1.1);
+      }
+
+      // Selecting a card
+      for (var i = 0; i < songs.length; i++) {
+        if (songs[i].isPressed()) {
+          chosenSong = i;
+          // If the user chose to do the tutorial, enter the tutorial scene
+          if (isDoingTutorial) {
+            startSecond = millis() / 1000;
+            gameState = "Tutorial";
+
+            // Load the tutorial pieces into the game
+            for (var x = 0; x < tutorialPieces.length; x++) {
+              mappedPieces[x] = { time: tutorialPieces[x].time, type: tutorialPieces[x].type };
+            }
+            return;
+          }
+
+          // At this point, the user is not doing the tutorial, so directly enter the game
+          gameState = "Game Scene";
+          countdownStart = millis();
+          mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+        }
+      }
+
+      // Toggle Switch
+      if (mouseInRect(width / 2 - 90, width / 2 + 90, height - 90, height - 10))
+        isDoingTutorial = !isDoingTutorial;
+      break;
   }
-  
-  // Function that is called when the user presses the mouse
-  function mousePressed() {
-    switch(gameState) {
-      case "Adjust Camera":
-        // Toggle switches for showing the keypoints and arms
-        if(mouseInRect(width-width/8-100,width-width/8+100,height/3+25,height/3+75)) showKeypoints = !showKeypoints;
-        if(mouseInRect(width-width/8-100,width-width/8+100,height/2+75,height/2+125)) showArms = !showArms;
-        break;
-      case "Select Song":
-        // In the select song panel, allow the user to select the song the mouse is currently hovering over
-        canPickSong = true;
-  
-        if(mouseInRect(width/2-32,width/2+32,height-82,height-18))
-          isDoingTutorial = !isDoingTutorial;
-        break;
-    }
-  }
-  
-  // Function that is called when the user releases the mouse
-  function mouseReleased() {
-    canPickSong = false;
-  }
-  
-  function mouseInRect(x1,x2,y1,y2) {
-    return mouseX > x1 && mouseX < x2 && mouseY > y1 && mouseY < y2;
-  }
+}
+
+// Returns true if the mouse is within the range of the given values
+function mouseInRect(xMin, xMax, yMin, yMax) {
+  return mouseX > xMin && mouseX < xMax && mouseY > yMin && mouseY < yMax;
+}

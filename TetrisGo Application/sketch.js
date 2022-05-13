@@ -13,8 +13,7 @@
 
 // This variable determines which scenario in the application we are in. It helps in scene navigation
 let gameState = "Main Menu";      // Determines which environment of the program we are in
-let iconSize = 200;               // Determines the size of the song boxes that you select
-let canPickSong = false;          // A workaround for the mousePressed event (canPickSong = is the mouse pressed)
+let iconSize = 150;               // Determines the size of the song boxes that you select
 let isDoingTutorial = false;      // Determines whether or not the player would like to start the game with a tutorial
 
 let showKeypoints = false;        // Determines whether or not we should show the keypoints of the predictions
@@ -166,8 +165,9 @@ function adjustCamera() {
 
 
   // Draw the webcam feed in the middle of the screen
+  imageMode(CENTER);
   push();
-  translate(width / 2 - video.width / 2 + video.width, height / 2 - video.height / 2);
+  translate(width / 2, height / 2);
   scale(-1, 1);
   image(video, 0, 0);
   pop();
@@ -312,104 +312,58 @@ function adjustCamera() {
 // Function that is called when we want to choose a song
 function selectSong() {
   // Set a solid background color
-  background(0, 40, 120);
+  background(255);
 
   // Title of page
-  fill(255);
-  textSize(80);
+  fill(98, 176, 245);
+  stroke(0);
+  strokeWeight(5);
+  textSize(60);
+  text("Select Your Song", width / 2, 75);
+
+
+  // Display and update the song cards
+  for(var i=0; i<songs.length; i++) {
+    songs[i].display(lerpCardX+i*cardWidth*1.1);
+    songs[i].interactWithMouse();
+  }
+
+  // Draw a white fade on both sides of the screen over the cards
+  strokeWeight(2);
+  for(var i=0; i<100; i++) {
+    stroke(255,map(i,0,100,255,0));
+    line(100+i,0,100+i,height);
+    line(width-100-i,0,width-100-i,height);
+  }
   noStroke();
-  textAlign(CENTER, CENTER);
-  text("Select a Song", width / 2, 75);
+  fill(255);
+  rect(50,height/2,100,height);
+  rect(width-50,height/2,100,height);
+
+  // Move the cards to the correct position
+  lerpCardX = lerp(lerpCardX,startCardX,0.1);
 
   // Toggle switch for Tutorial
-  if (isDoingTutorial) fill(0, 255, 0);
-  else noFill();
-  stroke(150);
-  strokeWeight(10);
-  rectMode(CENTER);
-  rect(width / 2, height - 50, 75, 75);
-  fill(255);
-  noStroke();
-  textSize(50);
-  text("Tutorial", width / 2 - 150, height - 45);
-
-  imageMode(CORNER);
-  for (var i = 0; i < 4; i++) {
-    for (var j = 0; j < 3; j++) {
-      var index = i + j * 4;
-
-      // If we have displayed all the songs that exist, leave the loop
-      if (index >= songs.length) continue;
-
-      var x = 50 + i * iconSize * 1.25;
-      var y = 150 + j * iconSize * 1.25;
-
-      // Display picture
-      noStroke();
-      image(songs[index].cover, x, y, iconSize, iconSize);
-
-
-      // Display difficulty
-      switch (songs[index].difficulty) {
-        case 0:
-          fill(0, 255, 0, 100);
-          break;
-        case 1:
-          fill(255, 255, 0, 100);
-          break;
-        case 2:
-          fill(255, 0, 0, 100);
-          break;
-      }
-      noStroke();
-      rectMode(CORNER);
-      rect(x, y + iconSize * 0.8, iconSize, iconSize * 0.2);
-
-
-
-      // Display Name
-      fill(255);
-      textSize(40);
-      textAlign(CENTER);
-      text(songs[index].name, x + iconSize / 2, y + iconSize * 1.2);
-
-      // Display mouse over image
-      if (mouseInRect(x, x + iconSize, y, y + iconSize)) {
-        stroke(0, 255, 0);
-
-        // If the mouse has been clicked, enter the game scene with the song the user has picked
-        if (canPickSong) {
-          chosenSong = index;
-
-          // If the user chose to do the tutorial, enter the tutorial scene
-          if (isDoingTutorial) {
-            startSecond = millis() / 1000;
-            gameState = "Tutorial";
-
-            // Load the tutorial pieces into the game
-            for (var x = 0; x < tutorialPieces.length; x++) {
-              mappedPieces[x] = { time: tutorialPieces[x].time, type: tutorialPieces[x].type };
-            }
-            return;
-          }
-
-          // At this point, the user is not doing the tutorial, so directly enter the game
-          gameState = "Game Scene";
-          countdownStart = millis();
-          mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
-        }
-      }
-      else {
-        // Highlight selected song
-        stroke(200);
-      }
-      // Display the outline of the song icon
-      strokeWeight(10);
-      noFill();
-      rectMode(CORNER);
-      rect(x, y, iconSize, iconSize, 10);
-    }
+  strokeWeight(4);
+  if(isDoingTutorial) {
+    fill(255,154,0,50);
+    stroke(255,77,0);
+  } else {
+    noFill();
+    stroke(100);
   }
+  rectMode(CENTER);
+  rect(width/2,height-50,180,60,5)
+  fill(200);
+  stroke(0);
+  strokeWeight(3);
+  textSize(50);
+  text("Tutorial", width/2, height-50);
+
+  // Move left and right buttons
+  strokeWeight(5);
+  triangle(30,height/2,90,height/2-30,90,height/2+30);
+  triangle(width-30,height/2,width-90,height/2-30,width-90,height/2+30);
 }
 
 
