@@ -50,10 +50,12 @@ function mousePressed() {
       for (var i = 0; i < songs.length; i++) {
         if (songs[i].isPressed()) {
           chosenSong = i;
+
+          setupTetrisPart();
+
           // If the user chose to do the tutorial, enter the tutorial scene
           if (isDoingTutorial) {
-            startSecond = millis() / 1000;
-            gameState = "Tutorial";
+            makeTransition("Tutorial");
 
             // Load the tutorial pieces into the game
             for (var x = 0; x < tutorialPieces.length; x++) {
@@ -63,8 +65,7 @@ function mousePressed() {
           }
 
           // At this point, the user is not doing the tutorial, so directly enter the game
-          gameState = "Game Scene";
-          countdownStart = millis();
+          makeTransition("Game Scene");
           mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
         }
       }

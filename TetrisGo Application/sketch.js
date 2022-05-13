@@ -375,14 +375,18 @@ function gameScene() {
     strokeWeight(1);
     line(0, y, width, y);
   }
-
+  
   // Display all the graphics related to the pose detection
   displayPoseElements();
-
+  
   // Display all the graphics related to the tetris game
   displayGameElements();
   displayTetrisElements();
 
+  if(isTransitioning) return;
+
+  if(countdownStart == 0) countdownStart = millis();
+  
   // Update and display the countdown timer and leave the function
   var currentSecond = floor(millis() - countdownStart) / 1000;
   if (currentSecond < 4) {
@@ -433,6 +437,10 @@ function tutorialScene() {
   // Display what the pose detector sees and the upcoming pieces
   displayPoseElements();
   displayTetrisElements();
+
+  if(isTransitioning) return;
+  if(startSecond == 0) startSecond = millis()/1000;
+
   updateGameElements();
 
   // For the first few seconds in the tutorial, display some text indicating when to pose properly

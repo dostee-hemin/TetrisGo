@@ -23,7 +23,6 @@ let grid = [];                  // The 2D array representing the tetris grid
 let cols = 10;                  // The number of columns in the grid
 let rows = 20;                  // The number of rows in the grid
 let scl = 30;                   // The size of each cell/box (in pixels)
-let speed = 1;                  // The dropspeed of the tetromino (in framesPerSecond)
 let currentTetrominoType;       // An integer ID representing the shape of the current tetromino
 let currentTetromino = [];      // The 2D array representing the coordinates of each box of the current tetromino
 let upcomingPieces = [];        // Contains pieces that are ready to be dropped (IDs) (note that normal tetrominos have IDs 0-7 and scrambled tetrominos have IDs 7-14)
@@ -109,6 +108,7 @@ function setupTetrisPart() {
   upcomingPieces = [];
   canDropPiece = true;
   startSecond = 0;
+  countdownStart = 0;
 }
 
 
@@ -957,7 +957,7 @@ function updateGameElements() {
   }
 
   // After a certain amount of frames, move the current piece down
-  if (frameCount % speed == 0 && !canDropPiece) currentTetromino = moveDown(currentTetromino);
+  if (!canDropPiece) currentTetromino = moveDown(currentTetromino);
 }
 
 
