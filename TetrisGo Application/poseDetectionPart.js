@@ -177,15 +177,30 @@ function isInPosition(orientations) {
 // These functions contribute to the drawing of the pose detection in any way possible.
 // If it controls color, shape, or text, it lies in this area.
 function displayPoseElements() {
-    push();
-    translate(width/2,height/2);
     // If there is a webcam feed available, draw it on the right side of the screen
     push();
-    translate(video.width,-video.height/2);
+    translate(width-video.width/2, 170+video.height/2);
     scale(-1,1);
-    imageMode(CORNER);
+    imageMode(CENTER);
     image(video,0,0);
     pop();
+    
+    // Draw the outline of the video feed and the prediction box
+    rectMode(CORNER);
+    noFill();
+    stroke(88,207,57);
+    strokeWeight(10);
+    rect(width-video.width,170,video.width-5,video.height);
+    fill(0);
+    rect(width-video.width-200,170,200,150);
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    rect(width-video.width,170,video.width-5,video.height);
+    rect(width-video.width-200,170,200,150);
+
+    // Display the prediction box title
+    image(statsImages[2], width-video.width-100, 210, 160, 40);
     
     // Get the index in the allLabels array that the current prediction is located
     let indexOfLabel = allLabels.indexOf(label);
@@ -194,7 +209,6 @@ function displayPoseElements() {
         // Display the label as a piece
         colorFromType(indexOfLabel+1);
         noStroke();
-        drawPieceShape(indexOfLabel, video.width/2, video.height/2+50, 28);
+        drawPieceShape(indexOfLabel, width-video.width-100, 270, 20);
     }
-    pop();
 }

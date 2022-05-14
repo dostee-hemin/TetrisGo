@@ -50,7 +50,6 @@ let cardHeight = 400;               // Height of the card (in pixels)
 
 
 
-
 /*-------------------- Setup -------------------*/
 function setupAnimationPart() {
     // Assign the columns and rows according to the width and height of the canvas
@@ -92,7 +91,7 @@ class RainEffect {
 
     update() {
         // Every frame, there's a random chance of adding a new falling piece
-        if (random(1) < 0.05) this.fallingPieces.push(new FallingPiece());
+        if (random(1) < 0.2) this.fallingPieces.push(new FallingPiece());
 
         // Loop through all the falling pieces
         for (var i = this.fallingPieces.length - 1; i >= 0; i--) {
@@ -230,8 +229,9 @@ class Card {
 
     // Return's true if the mouse hovers over the card and is within the boundaries of the left and right move buttons
     isUnderMouse() {
-        return mouseInRect(this.x-cardWidth/2,this.x+cardWidth/2,this.y-cardHeight/2,this.y+cardHeight/2) &&
-               mouseX > width/2-cardWidth*1.1*1.5 && mouseX < width/2+cardWidth*1.1*1.5;
+        return mouseX > this.x-cardWidth/2 && mouseX < this.x+cardWidth/2 &&
+               mouseX > width/2-cardWidth*1.1*1.5 && mouseX < width/2+cardWidth*1.1*1.5 &&
+               mouseY > height/2-20-cardHeight*0.5 && mouseY < height/2+50+cardHeight*0.5;
     }
 
     // Returns true if the card is currently levitating

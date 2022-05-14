@@ -8,7 +8,6 @@
 
 // These are the sounds of the game that will be played...
 let songs = [];                     // The list of the songs that can be played and their info
-let goSound;                        // When the countdown reaches "GO"
 let countdownSound;                 // When the countdown decrements
 let correctSound;                   // When the player makes the correct pose
 let wrongSound;                     // When the player runs out of posing time
@@ -18,6 +17,8 @@ let gameoverSound;                  // When the player tops out
 
 let poseImages = [];                // Contains the images used in the tutorial to show how to pose
 let logoImage;                      // Contains the image of the game logo
+let countdownImages = [];           // Contains the images for the 3, 2, 1, GO!
+let statsImages = [];               // Contains the title of the statistics that we display during the game
 
 
 
@@ -34,7 +35,6 @@ let logoImage;                      // Contains the image of the game logo
 function preload() {
     // I will be accessing the HTML audio elements and controlling their behavior via script rather than use p5.sound
     themeSong = document.getElementById("themeSong");
-    goSound = document.getElementById("go");
     countdownSound = document.getElementById("countdown");
     correctSound = document.getElementById("correct");
     wrongSound = document.getElementById("wrong");
@@ -42,15 +42,24 @@ function preload() {
     tetrisSound = document.getElementById("tetris");
     gameoverSound = document.getElementById("gameover");
 
-    poseImages[0] = loadImage("assets/Images/O.jpg");
-    poseImages[1] = loadImage("assets/Images/I.jpg");
-    poseImages[2] = loadImage("assets/Images/T.jpg");
-    poseImages[3] = loadImage("assets/Images/S.jpg");
-    poseImages[4] = loadImage("assets/Images/Z.jpg");
-    poseImages[5] = loadImage("assets/Images/L.jpg");
-    poseImages[6] = loadImage("assets/Images/J.jpg");
+    poseImages.push(loadImage("assets/Images/O.jpg"));
+    poseImages.push(loadImage("assets/Images/I.jpg"));
+    poseImages.push(loadImage("assets/Images/T.jpg"));
+    poseImages.push(loadImage("assets/Images/S.jpg"));
+    poseImages.push(loadImage("assets/Images/Z.jpg"));
+    poseImages.push(loadImage("assets/Images/L.jpg"));
+    poseImages.push(loadImage("assets/Images/J.jpg"));
 
     logoImage = loadImage("assets/Images/Logo.png");
+
+    countdownImages.push(loadImage("assets/Images/3.png"));
+    countdownImages.push(loadImage("assets/Images/2.png"));
+    countdownImages.push(loadImage("assets/Images/1.png"));
+    countdownImages.push(loadImage("assets/Images/GO!.png"));
+
+    statsImages.push(loadImage("assets/Images/score.png"));
+    statsImages.push(loadImage("assets/Images/lines.png"));
+    statsImages.push(loadImage("assets/Images/prediction.png"));
 }
 
 function setupHighScore() {

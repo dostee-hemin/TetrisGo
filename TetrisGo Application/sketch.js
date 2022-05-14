@@ -369,13 +369,9 @@ function selectSong() {
 
 // Function that is called when we are in the game scene
 function gameScene() {
-  // Draw a gradient background
-  for (let y = 0; y < height; y++) {
-    stroke(0, map(y, 0, height, 0, 255), 255);
-    strokeWeight(1);
-    line(0, y, width, y);
-  }
-  
+  // Draw a solid background
+  background(255);
+
   // Display all the graphics related to the pose detection
   displayPoseElements();
   
@@ -385,30 +381,23 @@ function gameScene() {
 
   if(isTransitioning) return;
 
-  if(countdownStart == 0) countdownStart = millis();
+  if(countdownStart == 0) {
+    countdownStart = millis();
+    playSound(countdownSound);
+  }
   
   // Update and display the countdown timer and leave the function
   var currentSecond = floor(millis() - countdownStart) / 1000;
   if (currentSecond < 4) {
-
-    // Dim the screen black
-    fill(0, 200);
-    noStroke();
-    rectMode(CORNER);
-    rect(0, 0, width, height);
-
     // Timer
-    var txts = ["3", "2", "1", "GO!"];
-    fill(255, 255, 0);
-    textSize(150);
-    textAlign(CENTER);
-    text(txts[int(currentSecond)], width / 2, height / 2);
-
-    // Everytime the countdown timer loses a second (i.e. 60 frames), play a sound
-    if (currentSecond % 1 < 0.1) {
-      if (currentSecond > 3) goSound.play();
-      else playSound(countdownSound);
-    }
+    var yOff = 16*pow(currentSecond%1-0.5,5);
+    var sizeOff = -64*pow(currentSecond%1-0.5,6)+1;
+    imageMode(CENTER);
+    push();
+    translate(width/2,height/2-yOff*150);
+    scale(sizeOff);
+    image(countdownImages[floor(currentSecond)],0,0);
+    pop();
     return;
   }
   // Once the countdown timer finishes, set the time that the game starts
@@ -427,12 +416,8 @@ function gameScene() {
 
 
 function tutorialScene() {
-  // Draw a gradient background
-  for (let y = 0; y < height; y++) {
-    stroke(0, map(y, 0, height, 0, 255), 255);
-    strokeWeight(1);
-    line(0, y, width, y);
-  }
+  // Draw a solid background
+  background(255);
 
   // Display what the pose detector sees and the upcoming pieces
   displayPoseElements();

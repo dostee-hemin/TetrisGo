@@ -524,8 +524,6 @@ function createTetrominoFromType(tetromino, type) {
 /*-------------------- Placement Algorithm -------------------*/
 // These functions contribute to the finding the optimum location on the board that the current piece should go to
 // The way we calculate scores is based on:
-// - Horizontal position (left side of the grid is favored)
-// - Tetris column (rightmost side of the grid is unfavored)
 // - Vertical position (the bottom of the grid is favored)
 // - Number of holes created (less holes created is favored)
 // - Number of lines cleared (more lines cleared is favored)
@@ -841,46 +839,71 @@ function drawPieceShape(pieceType, centerX, centerY, blockSize) {
 
 // Displays every tetris element like it was in the draw function
 function displayTetrisElements() {
-  push();
-  translate(100,50);
   // Display the board that contains the upcoming pieces
-  fill(50);
+  fill(0);
   stroke(25);
   strokeWeight(4);
-  rectMode(CENTER);
-  rect(scl*cols + 70, scl*(rows/2),100, scl*rows);
+  rectMode(CORNER);
+  rect(scl*cols + 150, 50, width-(scl*cols+150), 100);
+  stroke(100);
+  strokeWeight(4);
+  for(var i=0; i<width; i+=67) {
+    var x = i;
+    if(startSecond != 0) x -= ((millis()/1000-startSecond)%1)*67*poseTime;
+    if(x < 0) continue;
+    x += scl*cols + 150 + acceptanceAmount;
+    line(x,50,x,150);
+  }
 
   // Period in the board for accepting correct poses
-  fill(0,255,255,100);
-  noStroke();
-  rect(scl*cols+70, acceptanceAmount/2, 100, acceptanceAmount);
-
+  fill(255,50);
+  stroke(200);
+  strokeWeight(10);
+  rectMode(CENTER);
+  rect(scl*cols + 150+acceptanceAmount/2, 100, acceptanceAmount, 100, 4);
+  noFill();
+  stroke(0);
+  strokeWeight(2);
+  rect(scl*cols + 150+acceptanceAmount/2, 100, acceptanceAmount, 100, 4);
+  
   // Display the upcoming pieces
   if(startSecond != 0) {
     noStroke();
     for(let i=0; i<mappedPieces.length; i++) {
-      var y = acceptanceAmount/2 + (mappedPieces[i].time+startSecond+startDelay-millis()/1000) * scalingFactor;
-      if(y > scl*rows - 40) continue;
-
+      var x = acceptanceAmount/2 + (mappedPieces[i].time+startSecond+startDelay-millis()/1000) * scalingFactor;
       colorFromType(mappedPieces[i].type+1);
-      drawPieceShape(mappedPieces[i].type, scl*cols+70, y, 24);
+      drawPieceShape(mappedPieces[i].type, scl*cols+150+x, 100, 24);
     }
   }
-  pop();
 }
 
 function displayGameElements() {
   push();
   translate(100,50);
   // Display all elements in the grid
-  noStroke();
   rectMode(CORNER);
+  noStroke();
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       colorFromType(grid[i][j]);
       rect(i * scl, j * scl, scl, scl);
     }
   }
+  // Display the borders of the grid and stats
+  noFill();
+  stroke(98, 176, 245);
+  strokeWeight(10);
+  rect(0,0,scl*cols,scl*rows);
+  fill(0);
+  rect(scl*cols,scl*rows-300,200,150);
+  rect(scl*cols,scl*rows-150,200,150);
+  noFill();
+  stroke(0);
+  strokeWeight(2);
+  rect(0,0,scl*cols,scl*rows);
+  rect(scl*cols,scl*rows-300,200,150);
+  rect(scl*cols,scl*rows-150,200,150);
+  
 
   // Display the current tetromino only if it is currently being dropped
   if(!canDropPiece) {
@@ -890,14 +913,16 @@ function displayGameElements() {
     }
   }
 
-  // Display the score and line count text, with their record values
-  fill(0);
-  textSize(30);
-  textAlign(CENTER);
-  text("Score = " + score, cols/10*scl, rows*scl + 40);
-  text("Line Count = " + lineCount, cols/10*scl, rows*scl + 90);
-  text("Best score = " + highScore, (cols-cols/10)*scl, rows*scl + 40);
-  text("Best lines = " + highScoreLineCount, (cols-cols/10)*scl, rows*scl + 90);
+  // Display the score and line count
+  imageMode(CENTER);
+  image(statsImages[0], scl*cols+100, scl*rows-260, 150, 50);
+  image(statsImages[1], scl*cols+100, scl*rows-110, 150, 50);
+  fill(255);
+  noStroke();
+  textSize(50);
+  textAlign(CENTER, CENTER);
+  text(score, scl*cols+100, scl*rows-200);
+  text(lineCount, scl*cols+100, scl*rows-40);
   pop();
 }
 
