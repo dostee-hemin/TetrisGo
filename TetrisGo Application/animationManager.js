@@ -41,6 +41,17 @@ let lerpCardX = 0;                  // Used for creating a smooth transition whe
 let cardWidth = 250;                // Width of the card (in pixels)    
 let cardHeight = 400;               // Height of the card (in pixels)
 
+//------ For the level completion scene
+let titleY = -200;                  // The y position of the title text
+let camY = 1000;                    // The y position of the camera feed
+let gravity = 0.1;                  // The force of gravity that affects the velocity of the particles
+let fireworks = [];                 // Stores all the fireworks in the scene
+let facePieceType = 0;              // Represents the type of tetromino to place on the user's face
+let faceSize;                       // The distance between the nose and eye of the user (in pixels)
+let pixelSize = 4;                  // Represents the size of the individual pixels that make up the blocks
+let threshold;                      // Represents the distance from the nose that a pixel can not be drawn in
+let blockSize;                      // Represents the size of a single block in the face piece
+
 
 
 
@@ -247,6 +258,166 @@ class Card {
 }
 
 
+
+
+
+
+
+
+
+
+
+/*-------------------- Level Completed -------------------*/
+// Class that shows a firework launch into the sky then explode
+class Firework {
+    constructor() {
+        // Give the firework a random location along the x-axis and place it below the screen
+        this.location = createVector(random(width), height+50);
+        // Give the firework a random velocity pointing upward
+        this.velocity = createVector(random(-5,5), random(-5,-13));
+        
+        // Stores the trail and explosion particles of the current firework
+        this.sparks = [];
+        this.particles = [];
+
+        // Determines whether or not the firework has exploded yet
+        this.hasExploded = false;
+
+        // Assign the current firework to two random colors that are similar to each other (in HSB format)
+        this.color1 = {h: random(255), s: 255, b: 255}
+        this.color2 = {h: this.color1.h + random(-50,50), s: 255, b: 255};
+    }
+
+    display() {
+        // Display all the sparks
+        for(var i=0; i<this.sparks.length; i++) this.sparks[i].display();
+
+        // Display the particles
+        colorMode(HSB);
+        for(var i=0; i<this.particles.length; i++) this.particles[i].display();
+        colorMode(RGB);
+    }
+
+    update() {
+        // Update the sparks
+        for(var i=this.sparks.length-1; i>-1; i--) {
+            this.sparks[i].update();
+            if(this.sparks[i].isFinished()) {
+                this.sparks.splice(i,1);
+            }
+        }
+        // Update the particles
+        for(var i=this.particles.length-1; i>-1; i--) {
+            this.particles[i].update();
+            if(this.particles[i].isFinished()) {
+                this.particles.splice(i,1);
+            }
+        }
+
+        // If the firework is still going up, affect it by gravity and add sparks
+        if(this.velocity.y < 0) {
+            // Physics engine with gravity
+            this.velocity.y += gravity;
+            this.location.add(this.velocity);
+
+            // Every frame, add a few sparks at the firework's current location
+            for(var i=0; i<3; i++) {
+                this.sparks.push(new Spark(this.location.x,this.location.y));
+            }
+
+            return;
+        } 
+        
+        // If the firework has not exploded yet, make it explode once and only once
+        if(!this.hasExploded) {
+            this.hasExploded = true;
+
+            // Add new particles to the firework at the current location and one of the two colors
+            for(var i=0; i<200; i++) {
+                this.particles.push(new Particle(
+                    this.location.x,
+                    this.location.y,
+                    (random(1) < 0.5) ? this.color1 : this.color2));
+            }
+        }
+    }
+
+    // Returns true if the firework has exploded and there are no particles left to show
+    isFinished() {
+        return this.hasExploded && this.particles.length == 0;
+    }
+}
+
+// Class for displaying the trail that comes from a firework before it explodes
+class Spark {
+    constructor(x, y) {
+        // Set the location of the spark to the given coordinates
+        this.location = createVector(x,y);
+
+        // Give the spark a random velocity pointing down
+        this.velocity = createVector(random(-1,1),random(0.5,2));
+
+        // Give the spark a random amount of frames left to be displayed
+        this.lifetime = random(10,20);
+    }
+
+    display() {
+        // Draw the spark as a bright yellow point
+        stroke(random(200,255),random(200,255),random(100,200));
+        strokeWeight(1);
+        point(this.location.x,this.location.y);
+    }
+
+    update() {
+        // Update the physics of the spark and decrease the amount of frames it has left to live
+        this.location.add(this.velocity);
+        this.lifetime--;
+    }
+
+    // Returns true when the spark has no more frames left to live
+    isFinished() {
+        return this.lifetime < 0;
+    }
+}
+
+// Class for displaying the explosion of a firework
+class Particle {
+    constructor(x, y, c) {
+        // Set the location of the particle to the given coordinates
+        this.location = createVector(x,y);
+        // Give the particle a velocity pointing in a random direction
+        this.velocity = p5.Vector.random2D().mult(random(3));
+
+        // Set the color of the particle to the color given
+        this.color = c;
+
+        // Give the particle a random size
+        this.size = random(1,4);
+
+        // Give the particle a random amount of frames left to be displayed
+        this.lifetime = random(30,50);
+    }
+
+    display() {
+        // Draw the particle as a point with the color in HSB format
+        stroke(this.color.h,this.color.s,this.color.b);
+        strokeWeight(this.size);
+        point(this.location.x,this.location.y);
+    }
+
+    update() {
+        // Update the physics of the spark and decrease the amount of frames it has left to live
+        this.velocity.y += gravity*0.7;
+        this.location.add(this.velocity);
+
+        this.lifetime--;
+    }
+
+    // Returns true when the spark has no more frames left to live
+    isFinished() {
+        return this.lifetime < 0;
+    }
+}
 
 
 

@@ -906,6 +906,7 @@ function displayGameElements() {
   
 
   // Display the current tetromino only if it is currently being dropped
+  noStroke();
   if(!canDropPiece) {
     for (let i = 0; i < 4; i++) {
       colorFromType((upcomingPieces[0]%7)+1);
@@ -1016,4 +1017,9 @@ function shuffleArray(array) {
       array[i] = array[j];
       array[j] = temp;
   }
+}
+
+// Returns the distance squared between two coordinates (faster than dist())
+function distSq(x1, y1, x2, y2) {
+  return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 }
