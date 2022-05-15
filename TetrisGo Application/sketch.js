@@ -13,9 +13,7 @@
 
 // This variable determines which scenario in the application we are in. It helps in scene navigation
 let gameState = "Main Menu";      // Determines which environment of the program we are in
-let iconSize = 150;               // Determines the size of the song boxes that you select
 let isDoingTutorial = false;      // Determines whether or not the player would like to start the game with a tutorial
-
 let showKeypoints = false;        // Determines whether or not we should show the keypoints of the predictions
 let showArms = false;             // Determines whether or not we should show the arm segments of the predictions
 let switchPosition = { x1: 0, x2: 0 };  // Stores the x positions of the toggle switches
@@ -469,30 +467,18 @@ function tutorialScene() {
 }
 
 function gameOver() {
-  // Draw a gradient background
-  for (let y = 0; y < height; y++) {
-    stroke(0, map(y, 0, height, 0, 255), 255);
-    strokeWeight(1);
-    line(0, y, width, y);
-  }
+  // Draw a solid background
+  background(0)
 
   // Game over text
-  fill(255, 0, 0);
-  textSize(150);
-  textAlign(CENTER);
-  if (int(frameCount / 30) % 2 == 0) text("Game Over", width / 2, 200);
-
-  // Stats
-  fill(255);
-  textSize(75);
-  text("Score = " + score, width / 2, height / 2 - 50);
-  text("Line Count = " + lineCount, width / 2, height / 2 + 50);
-  text("Best Score = " + highScore, width / 2, height / 2 + 150);
-  text("Best Line Count = " + highScoreLineCount, width / 2, height / 2 + 250);
+  imageMode(CENTER);
+  if((floor(float(frameCount)/60))%2==0) image(gameOverImage, width/2, height/2, width*0.8, 150);
 
   // Restart
-  fill(200);
-  text("Press 'r' to restart", width / 2, height / 2 + 350);
+  textSize(60);
+  fill(255);
+  textAlign(CENTER);
+  text("Press 'r' to restart", width / 2, height-50);
 }
 
 function levelCompleted() {

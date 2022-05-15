@@ -17,6 +17,7 @@ let gameoverSound;                  // When the player tops out
 
 let poseImages = [];                // Contains the images used in the tutorial to show how to pose
 let logoImage;                      // Contains the image of the game logo
+let gameOverImage;                  // Contains the image for the game over title
 let countdownImages = [];           // Contains the images for the 3, 2, 1, GO!
 let statsImages = [];               // Contains the title of the statistics that we display during the game
 
@@ -51,6 +52,7 @@ function preload() {
     poseImages.push(loadImage("assets/Images/J.jpg"));
 
     logoImage = loadImage("assets/Images/Logo.png");
+    gameOverImage = loadImage("assets/Images/gameover.png");
 
     countdownImages.push(loadImage("assets/Images/3.png"));
     countdownImages.push(loadImage("assets/Images/2.png"));
