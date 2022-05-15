@@ -410,9 +410,10 @@ function gameScene() {
   if (millis() / 1000 > startSecond + startDelay + songs[chosenSong].music.duration()) {
     gameState = "Level Completed";
     titleY = -200;
-    camY = 1000;
+    camY = 10000;
     fireworks = [];
     facePieceType = floor(random(7));
+    winSound.play();
   }
 
   updateGameElements();
@@ -433,26 +434,39 @@ function tutorialScene() {
   updateGameElements();
 
   // For the first few seconds in the tutorial, display some text indicating when to pose properly
-  if (startSecond + startDelay - millis() / 1000 > -1.5) {
-    fill(255);
+  if (startSecond + startDelay - millis() / 1000 > -0.5) {
+    fill(0);
     textSize(25);
     textAlign(CENTER);
     noStroke();
-    text("When the piece comes here,\nmake the correct pose", 170, 50 + acceptanceAmount / 2);
+    text("When the piece comes here,\nmake the correct pose", 180, 100);
 
     // Arrow pointing to the middle of the acceptance zone
-    stroke(255);
+    stroke(0);
     strokeWeight(5);
-    line(340, 50 + acceptanceAmount / 2, 390, 50 + acceptanceAmount / 2);
-    line(365, 25 + acceptanceAmount / 2, 390, 50 + acceptanceAmount / 2);
-    line(365, 75 + acceptanceAmount / 2, 390, 50 + acceptanceAmount / 2);
+    line(350, 100, 400, 100);
+    line(375, 75, 400, 100);
+    line(375, 125, 400, 100);
+  } else {
+    fill(0);
+    textSize(35);
+    textAlign(CENTER);
+    noStroke();
+    text("Do this pose", 260, 150);
+
+    // Arrow pointing to the middle of the acceptance zone
+    stroke(0);
+    strokeWeight(5);
+    line(260, 200, 260, 250);
+    line(235, 225, 260, 250);
+    line(285, 225, 260, 250);
   }
 
   // If there are pieces coming, display the correct pose image that represents the current piece
   if (mappedPieces.length != 0) {
-    if (abs((mappedPieces[0].time + startSecond + startDelay) - millis() / 1000) < poseTime - 0.3) {
+    if (abs((mappedPieces[0].time + startSecond + startDelay) - millis() / 1000) < poseTime+0.5) {
       imageMode(CENTER);
-      image(poseImages[mappedPieces[0].type], 210, height / 2, 400, 400);
+      image(poseImages[mappedPieces[0].type], 260, height -250, 500, 500);
     }
   }
 
@@ -472,7 +486,7 @@ function gameOver() {
 
   // Game over text
   imageMode(CENTER);
-  if((floor(float(frameCount)/60))%2==0) image(gameOverImage, width/2, height/2, width*0.8, 150);
+  if((floor(float(frameCount)/30))%2==0) image(gameOverImage, width/2, height/2, width*0.8, 150);
 
   // Restart
   textSize(60);
@@ -533,6 +547,11 @@ function levelCompleted() {
   imageMode(CENTER);
   image(video, 0, 0);
   pop();
+  noFill();
+  stroke(200);
+  strokeWeight(8);
+  rectMode(CENTER);
+  rect(width/2, camY, video.width, video.height, 5);
 
   // Move the camera feed's y position to the correct location
   camY = lerp(camY, height / 2 + 50, 0.1);

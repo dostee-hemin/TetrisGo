@@ -14,6 +14,8 @@ let wrongSound;                     // When the player runs out of posing time
 let lineclearSound;                 // When 1-3 lines are cleared
 let tetrisSound;                    // When 4 lines are cleared
 let gameoverSound;                  // When the player tops out
+let fireworkSound;                  // When a firework explodes
+let winSound;                       // When the player reaches the Level Completed scene
 
 let poseImages = [];                // Contains the images used in the tutorial to show how to pose
 let logoImage;                      // Contains the image of the game logo
@@ -42,14 +44,17 @@ function preload() {
     lineclearSound = document.getElementById("lineclear");
     tetrisSound = document.getElementById("tetris");
     gameoverSound = document.getElementById("gameover");
-
-    poseImages.push(loadImage("assets/Images/O.jpg"));
-    poseImages.push(loadImage("assets/Images/I.jpg"));
-    poseImages.push(loadImage("assets/Images/T.jpg"));
-    poseImages.push(loadImage("assets/Images/S.jpg"));
-    poseImages.push(loadImage("assets/Images/Z.jpg"));
-    poseImages.push(loadImage("assets/Images/L.jpg"));
-    poseImages.push(loadImage("assets/Images/J.jpg"));
+    fireworkSound = loadSound("assets/Sounds/firework.mp3");
+    fireworkSound.playMode("sustain");
+    winSound = loadSound("assets/Sounds/win.mp3");
+    
+    poseImages.push(loadImage("assets/Images/O.png"));
+    poseImages.push(loadImage("assets/Images/I.png"));
+    poseImages.push(loadImage("assets/Images/T.png"));
+    poseImages.push(loadImage("assets/Images/S.png"));
+    poseImages.push(loadImage("assets/Images/Z.png"));
+    poseImages.push(loadImage("assets/Images/L.png"));
+    poseImages.push(loadImage("assets/Images/J.png"));
 
     logoImage = loadImage("assets/Images/Logo.png");
     gameOverImage = loadImage("assets/Images/gameover.png");

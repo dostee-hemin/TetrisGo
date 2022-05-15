@@ -253,7 +253,7 @@ function checkLines() {
   }
 
   // Play the correct sound based on the number of lines cleared
-  if(gameScene != "Tutorial") {
+  if(gameState != "Tutorial") {
     if(numberOfClears == 4) playSound(tetrisSound);
     else if(numberOfClears > 0) playSound(lineclearSound);
   }
@@ -857,14 +857,21 @@ function displayTetrisElements() {
 
   // Period in the board for accepting correct poses
   fill(255,50);
+  noStroke();
+  rectMode(CENTER);
+  rect(scl*cols + 150+acceptanceAmount/2, 100, acceptanceAmount, 100, 4);
+  if(posedInTime) fill(0,255,0,acceptanceFade);
+  else fill(255,0,0,acceptanceFade);
   stroke(200);
   strokeWeight(10);
-  rectMode(CENTER);
   rect(scl*cols + 150+acceptanceAmount/2, 100, acceptanceAmount, 100, 4);
   noFill();
   stroke(0);
   strokeWeight(2);
   rect(scl*cols + 150+acceptanceAmount/2, 100, acceptanceAmount, 100, 4);
+
+  // Make the flash fade away over time
+  if(acceptanceFade > 0) acceptanceFade -= 5;
   
   // Display the upcoming pieces
   if(startSecond != 0) {
@@ -956,21 +963,25 @@ function updateGameElements() {
     // Set the current tetromino type to the next piece that's coming in the song
     currentTetrominoType = mappedPieces[0].type;
 
-    // Calculate the y position of the piece in the track
-    var y = acceptanceAmount/2+(mappedPieces[0].time+startSecond+startDelay-millis()/1000) * scalingFactor;
+    // Calculate the x position of the piece in the track
+    var x = acceptanceAmount/2+(mappedPieces[0].time+startSecond+startDelay-millis()/1000) * scalingFactor;
     
     // If the player couldn't pose in time, drop a scrambled tetromino
-    if (y < 0) {
+    if (x < 0) {
       upcomingPieces.push(currentTetrominoType+7);
       playSound(wrongSound);
       mappedPieces.shift();
+      posedInTime = false;
+      acceptanceFade = 150;
     } 
     // If the player did do the correct pose in the allowed amount of time, drop an ordinary tetromino
-    else if(y < acceptanceAmount) {
+    else if(x < acceptanceAmount) {
       if(allLabels.indexOf(label) == currentTetrominoType) {
         upcomingPieces.push(currentTetrominoType);
         playSound(correctSound);
         mappedPieces.shift();
+        posedInTime = true;
+        acceptanceFade = 150;
       }
     }
   }

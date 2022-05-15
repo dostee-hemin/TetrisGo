@@ -13,7 +13,7 @@ function keyPressed() {
       // If the user presses the r key, reset the game
       if (key == 'r' || key == 'R') {
         songs[chosenSong].music.stop();
-        makeTransition("Select Song");
+        makeTransition("Main Menu");
       }
       break;
     case "Adjust Camera":

@@ -41,9 +41,13 @@ let lerpCardX = 0;                  // Used for creating a smooth transition whe
 let cardWidth = 250;                // Width of the card (in pixels)    
 let cardHeight = 400;               // Height of the card (in pixels)
 
+//------ For the game scene
+let acceptanceFade = 0;
+let posedInTime = false;
+
 //------ For the level completion scene
 let titleY = -200;                  // The y position of the title text
-let camY = 1000;                    // The y position of the camera feed
+let camY = 10000;                    // The y position of the camera feed
 let gravity = 0.1;                  // The force of gravity that affects the velocity of the particles
 let fireworks = [];                 // Stores all the fireworks in the scene
 let facePieceType = 0;              // Represents the type of tetromino to place on the user's face
@@ -331,6 +335,8 @@ class Firework {
         // If the firework has not exploded yet, make it explode once and only once
         if(!this.hasExploded) {
             this.hasExploded = true;
+
+            fireworkSound.play();
 
             // Add new particles to the firework at the current location and one of the two colors
             for(var i=0; i<200; i++) {
