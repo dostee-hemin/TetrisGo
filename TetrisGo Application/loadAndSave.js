@@ -82,7 +82,7 @@ function loadSongsInfo() {
     songs.push(new Card("Beggin'", 1));
     songs.push(new Card("Ah Yani", 0));
     songs.push(new Card("Dance Monkey", 0));
-    songs.push(new Card("Zumba", 1));
+    songs.push(new Card("Kurda", 1));
     songs.push(new Card("Khappa Gyan Bukhom", 0));
     songs.push(new Card("Gangnam Style", 1));
 

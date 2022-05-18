@@ -569,7 +569,7 @@ function levelCompleted() {
   rectMode(CENTER);
   switch (facePieceType) {
     case 0: // O Piece
-      drawFaceShape(nose.x - b, nose.x + b, nose.y - b, nose.y + b);
+      drawFaceShape(nose.x - blockSize, nose.x + blockSize, nose.y - blockSize, nose.y + blockSize);
       break;
     case 1: // I Piece
       drawFaceShape(nose.x - blockSize * 0.5, nose.x + blockSize * 0.5, nose.y - blockSize * 2, nose.y + blockSize * 2);
@@ -579,12 +579,12 @@ function levelCompleted() {
       drawFaceShape(nose.x - blockSize * 0.5, nose.x + blockSize * 0.5, nose.y + blockSize * 0.2, nose.y + blockSize * 1.2);
       break;
     case 3: // S Piece
-      drawFaceShape(nose.x - b, nose.x, nose.y - blockSize * 1.5, nose.y + blockSize * 0.5);
-      drawFaceShape(nose.x, nose.x + b, nose.y - blockSize * 0.5, nose.y + blockSize * 1.5);
+      drawFaceShape(nose.x - blockSize, nose.x, nose.y - blockSize * 1.5, nose.y + blockSize * 0.5);
+      drawFaceShape(nose.x, nose.x + blockSize, nose.y - blockSize * 0.5, nose.y + blockSize * 1.5);
       break;
     case 4: // Z Piece
-      drawFaceShape(nose.x, nose.x + b, nose.y - blockSize * 1.5, nose.y + blockSize * 0.5);
-      drawFaceShape(nose.x - b, nose.x, nose.y - blockSize * 0.5, nose.y + blockSize * 1.5);
+      drawFaceShape(nose.x, nose.x + blockSize, nose.y - blockSize * 1.5, nose.y + blockSize * 0.5);
+      drawFaceShape(nose.x - blockSize, nose.x, nose.y - blockSize * 0.5, nose.y + blockSize * 1.5);
       break;
     case 5: // L Piece
       drawFaceShape(nose.x - blockSize * 1.5, nose.x - blockSize * 0.5, nose.y + blockSize * 0.5, nose.y + blockSize * 1.5);

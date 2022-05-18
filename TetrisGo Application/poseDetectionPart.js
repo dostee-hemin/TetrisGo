@@ -56,7 +56,7 @@ function setupPoseDetectionPart() {
   pose.onResults(predict);
 
   // Get the HTML video element that is our webcam
-  let videoElement = document.getElementById('video');
+  let videoElement = document.getElementsByTagName("video")[0];
   // Provide the webcam feed to the pose detector
   let camera = new Camera(videoElement, {
     onFrame: async () => {

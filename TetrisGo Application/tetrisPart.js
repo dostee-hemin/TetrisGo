@@ -37,7 +37,7 @@ let acceptanceAmount = 150;     // Amount in pixels that the piece has to be nea
 let startSecond = 0;            // Represents the exact second the player started playing the game
 let poseTime = 3;               // Time (in seconds) give to the player to pose a given piece
 let scalingFactor = scl*rows/poseTime;    // Converts seconds of the song to pixels in the screen
-let startDelay = 3;             // Amount of time (in seconds) before the music starts
+let startDelay = 5;             // Amount of time (in seconds) before the music starts
 
 let lineCount = 0;              // Number of lines cleared in total
 let highScoreLineCount = 0;     // Best number of line clears
