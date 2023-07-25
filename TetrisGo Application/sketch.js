@@ -284,6 +284,7 @@ function adjustCamera() {
   text(round(frameRate()), width / 8, height / 2 + 110);
 
   // Create the graph from the list of framerate logs
+  let framerateAvg = 0;
   fill(0, 255, 0, 100);
   stroke(0, 200, 0);
   strokeWeight(1);
@@ -291,9 +292,20 @@ function adjustCamera() {
   vertex(width / 8 - 100, height / 2 + 200)
   for (var i = 0; i < framerateLogs.length; i++) {
     vertex(width / 8 - 100 + i, height / 2 + 200 - framerateLogs[i] / 70 * 50);
+    framerateAvg += framerateLogs[i];
   }
+  framerateAvg /= framerateLogs.length;
   vertex(width / 8 - 101 + framerateLogs.length, height / 2 + 200)
   endShape(CLOSE);
+
+  stroke(100);
+  strokeWeight(2);
+  line(width / 8 - 100, height / 2 + 200 - framerateAvg / 70 * 50, width / 8 - 100+framerateLogs.length, height / 2 + 200 - framerateAvg / 70 * 50);
+  fill(0);
+  noStroke();
+  textSize(20);
+  textAlign(CENTER);
+  text(round(framerateAvg), width / 8 - 100-30, height / 2 + 200 - framerateAvg / 70 * 50)
 
   // Create the graph axis
   stroke(0);
@@ -558,14 +570,14 @@ function levelCompleted() {
 
   // Calculate the values for drawing the face piece
   faceSize = dist(nose.x, nose.y, eye.x, eye.y);
-  blockSize = faceSize * 6;
   threshold = faceSize * 1.9;
+  blockSize = threshold*2.1;
 
   // Draw the piece on the user's face
   push();
   translate((width - video.width) / 2, camY - video.height / 2);
   colorFromType(facePieceType+1);
-  noStroke();
+  strokeWeight(2);
   rectMode(CENTER);
   switch (facePieceType) {
     case 0: // O Piece

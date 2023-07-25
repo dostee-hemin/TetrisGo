@@ -34,16 +34,11 @@ let allLabels = ["O", "I", "T", "S", "Z", "L", "J"];
 /*-------------------- Setup -------------------*/
 // This function sets up the pose detection part of the application before running
 function setupPoseDetectionPart() {
-  // Create the video element from the webcam and set the size
-  video = createCapture(VIDEO);
-  video.size(640, 480);
-  video.hide();
-
   // Create a new pose detector using the BlazePose model
-  let pose = new Pose({locateFile: (file) => {
+  let posePredictor = new Pose({locateFile: (file) => {
     return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
   }});
-  pose.setOptions({
+  posePredictor.setOptions({
       modelComplexity: 0,
       smoothLandmarks: true,
       enableSegmentation: true,
@@ -53,19 +48,41 @@ function setupPoseDetectionPart() {
   });
 
   // Set the function that will run when we get a pose
-  pose.onResults(predict);
+  posePredictor.onResults(predict);
 
   // Get the HTML video element that is our webcam
-  let videoElement = document.getElementsByTagName("video")[0];
+  let videoElement = document.getElementsByClassName("input_video")[0];
   // Provide the webcam feed to the pose detector
   let camera = new Camera(videoElement, {
     onFrame: async () => {
-      await pose.send({image: videoElement});
+      await posePredictor.send({image: videoElement});
     },
     width: 640,
     height: 480
   });
   camera.start();
+
+  /*   This code is constructs a p5 Media Element using the existing video HTML tag   */
+  const node = this._userNode ? this._userNode : document.body;
+  node.appendChild(videoElement);
+  const mediaEl = new p5.MediaElement(videoElement, this)
+  this._elements.push(mediaEl);
+  mediaEl.loadedmetadata = false;
+
+  videoElement.addEventListener('loadedmetadata', () => {
+    mediaEl.width = videoElement.videoWidth;
+    mediaEl.height = videoElement.videoHeight;
+
+    if (mediaEl.elt.width === 0) mediaEl.elt.width = videoElement.videoWidth;
+    if (mediaEl.elt.height === 0) mediaEl.elt.height = videoElement.videoHeight;
+    if (mediaEl.presetPlaybackRate) {
+      mediaEl.elt.playbackRate = mediaEl.presetPlaybackRate;
+      delete mediaEl.presetPlaybackRate;
+    }
+    mediaEl.loadedmetadata = true;
+  });
+
+  video = mediaEl;
 
   // Disable the HTML video element so that it doesn't interfere with our p5 sketch
   videoElement.style.display = "none";
@@ -85,6 +102,13 @@ function predict(results) {
   // The keypoints in the current pose
   let points = results.poseLandmarks;
   if(points == null) return;
+  
+  // Set the location of the nose
+  if(gameState == "Level Completed") {
+    nose = {x: (1-points[0].x)*video.width, y: points[0].y*video.height};
+    eye = {x: (1-points[2].x)*video.width, y: points[2].y*video.height};
+    return;
+  }
 
   // Set all the keypoints to the landmarks we just found
   if(showKeypoints) {
@@ -93,12 +117,6 @@ function predict(results) {
       if(points[i].x < 0 || points[i].x > 1 || points[i].y < 0 || points[i].y > 1) continue;
       keypoints.push({x: (1-points[i].x)*video.width, y: points[i].y*video.height});
     }
-  }
-
-  // Set the location of the nose
-  if(gameState == "Level Completed") {
-    nose = {x: (1-points[0].x)*video.width, y: points[0].y*video.height};
-    eye = {x: (1-points[2].x)*video.width, y: points[2].y*video.height};
   }
 
   // Set all the arm keypoints according to pose (each armPoint is an (x, y) coordinate)

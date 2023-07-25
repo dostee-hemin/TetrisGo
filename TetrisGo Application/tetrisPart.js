@@ -218,7 +218,7 @@ function moveSideways(dir, tetromino) {
 // These functions control the grid's behavior
 function endGame() {
   gameState = "Game Over";
-  resetSound(songs[chosenSong].music);
+  songs[chosenSong].music.stop();
   playSound(gameoverSound);
 }
 
@@ -792,6 +792,7 @@ function colorFromType(type) {
   
   // Set the fill to the color in the array at the index with the "type" value
   fill(allColors[type]);
+  stroke(allColors[type]);
 }
 
 // Draw the representation of a given piece at a specific location with a specific size
