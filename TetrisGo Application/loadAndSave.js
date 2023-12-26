@@ -67,6 +67,9 @@ function preload() {
     statsImages.push(loadImage("assets/Images/score.png"));
     statsImages.push(loadImage("assets/Images/lines.png"));
     statsImages.push(loadImage("assets/Images/prediction.png"));
+
+    setupPoseDetectionPart();
+    loadSongsInfo();
 }
 
 function setupHighScore() {

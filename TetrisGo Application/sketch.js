@@ -35,12 +35,6 @@ function setup() {
   switchPosition.x1 = width - width / 8 - 50;
   switchPosition.x2 = switchPosition.x1;
 
-  // Load the info about the songs
-  loadSongsInfo();
-
-  // Call the setup function for the pose detection part of the application
-  setupPoseDetectionPart();
-
   // Call the setup function for the tetris part of the application
   setupTetrisPart();
 
@@ -128,6 +122,9 @@ function mainMenu() {
   strokeWeight(5);
   fill(98, 176, 245);
   stroke(0);
+
+  if(label == "waiting") prompt = "  Loading.... ";
+  else prompt = "Press 'Enter'";
 
   // Loop through all the characters in the prompt string
   for (var i = 0; i < promptOffsets.length; i++) {

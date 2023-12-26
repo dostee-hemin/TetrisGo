@@ -4,7 +4,7 @@ function keyPressed() {
   switch (gameState) {
     case "Main Menu":
       // In the main menu, if the user presses the enter key, move on to adjusting the camera
-      if (keyCode == RETURN) makeTransition("Adjust Camera");
+      if (keyCode == RETURN && label!="waiting") makeTransition("Adjust Camera");
       break;
     case "Game Scene":
     case "Game Over":
