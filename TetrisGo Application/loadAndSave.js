@@ -36,38 +36,7 @@ let statsImages = [];               // Contains the title of the statistics that
 
 // This function will be run before the setup() of the program to load all the song files into the program
 function preload() {
-    // I will be accessing the HTML audio elements and controlling their behavior via script rather than use p5.sound
-    countdownSound = loadSound("./TetrisGo Application/assets/Sounds/countdown.mp3");
-    correctSound = loadSound("./TetrisGo Application/assets/Sounds/correct.mp3");
-    wrongSound = loadSound("./TetrisGo Application/assets/Sounds/wrong.mp3");
-    lineclearSound = loadSound("./TetrisGo Application/assets/Sounds/lineclear.mp3");
-    tetrisSound = loadSound("./TetrisGo Application/assets/Sounds/tetris.mp3");
-    gameoverSound = loadSound("./TetrisGo Application/assets/Sounds/game over.mp3");
-    fireworkSound = loadSound("./TetrisGo Application/assets/Sounds/firework.mp3");
-    winSound = loadSound("./TetrisGo Application/assets/Sounds/win.mp3");
-    
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/O.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/I.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/T.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/S.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/Z.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/L.png"));
-    poseImages.push(loadImage("./TetrisGo Application/assets/Images/J.png"));
-
     logoImage = loadImage("./TetrisGo Application/assets/Images/Logo.png");
-    gameOverImage = loadImage("./TetrisGo Application/assets/Images/gameover.png");
-
-    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/3.png"));
-    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/2.png"));
-    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/1.png"));
-    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/GO!.png"));
-
-    statsImages.push(loadImage("./TetrisGo Application/assets/Images/score.png"));
-    statsImages.push(loadImage("./TetrisGo Application/assets/Images/lines.png"));
-    statsImages.push(loadImage("./TetrisGo Application/assets/Images/prediction.png"));
-
-    setupPoseDetectionPart();
-    loadSongsInfo();
 }
 
 function setupHighScore() {
@@ -77,33 +46,35 @@ function setupHighScore() {
 
 // Loads the songs and their information
 function loadSongsInfo() {
-    // Here is where you add new songs to the list.
-    // Every element needs the name of the song and the difficulty
-    songs.push(new Card("Tetris Theme", 2));
-    songs.push(new Card("Beggin'", 1));
-    songs.push(new Card("Ah Yani", 0));
-    songs.push(new Card("Dance Monkey", 0));
-    songs.push(new Card("Kurda", 1));
-    songs.push(new Card("Khappa Gyan Bukhom", 0));
-    songs.push(new Card("Gangnam Style", 1));
+  if(songs.length != 0) return;
 
-    // Bubble sort the songs based on difficulty in ascending order
-    for(var i=0; i<songs.length-1; i++) {
-      for(var j=0; j<songs.length-1-i; j++) {
-        if(songs[j].difficulty > songs[j+1].difficulty) {
-          var temp = songs[j];
-          songs[j] = songs[j+1];
-          songs[j+1] = temp;
-        }
+  // Here is where you add new songs to the list.
+  // Every element needs the name of the song and the difficulty
+  songs.push(new Card("Tetris Theme", 2));
+  songs.push(new Card("Beggin'", 1));
+  songs.push(new Card("Ah Yani", 0));
+  songs.push(new Card("Dance Monkey", 0));
+  songs.push(new Card("Kurda", 1));
+  songs.push(new Card("Khappa Gyan Bukhom", 0));
+  songs.push(new Card("Gangnam Style", 1));
+
+  // Bubble sort the songs based on difficulty in ascending order
+  for(var i=0; i<songs.length-1; i++) {
+    for(var j=0; j<songs.length-1-i; j++) {
+      if(songs[j].difficulty > songs[j+1].difficulty) {
+        var temp = songs[j];
+        songs[j] = songs[j+1];
+        songs[j+1] = temp;
       }
     }
-  
-    // Loop through all songs and load their music and cover images
-    for(var i=0; i<songs.length; i++) {
-      songs[i].setAssets(
-        loadSound('./TetrisGo Application/assets/Songs/' + songs[i].name + ' Song.mp3'),
-        loadImage('./TetrisGo Application/assets/Cover Images/'+songs[i].name+' Cover.png'));
-    }
+  }
+
+  // Loop through all songs and load their music and cover images
+  for(var i=0; i<songs.length; i++) {
+    songs[i].setAssets(
+      loadSound('./TetrisGo Application/assets/Songs/' + songs[i].name + ' Song.mp3'),
+      loadImage('./TetrisGo Application/assets/Cover Images/'+songs[i].name+' Cover.png'));
+  }
 }
   
 // Function to be called once the text file that contains the mapped pieces is laoded
