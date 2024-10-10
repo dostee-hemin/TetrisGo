@@ -13,6 +13,7 @@
 
 /*-------------------- Variables -------------------*/
 let video;                // The p5 DOM element representing the webcam feed
+let camera;
 let armPoints = [];       // The list of pose keypoints that make up the left and right arm of the current pose 
 let keypoints = [];       // The list of all the pose keypoints in the prediction\
 let nose;                 // Stores the location of the nose
@@ -20,7 +21,7 @@ let eye;                  // Stores the location of the left eye
 
 // The label of the model's prediction 
 // (by default it's set to waiting until the model comes online)
-let label = "waiting";
+let label = "enter";
 
 // This array contains all the possible pose labels that could come out of the model
 let allLabels = ["O", "I", "T", "S", "Z", "L", "J"];
@@ -53,14 +54,13 @@ function setupPoseDetectionPart() {
   // Get the HTML video element that is our webcam
   let videoElement = document.getElementsByClassName("input_video")[0];
   // Provide the webcam feed to the pose detector
-  let camera = new Camera(videoElement, {
+  camera = new Camera(videoElement, {
     onFrame: async () => {
       await posePredictor.send({image: videoElement});
     },
     width: 640,
     height: 480
   });
-  camera.start();
 
   /*   This code is constructs a p5 Media Element using the existing video HTML tag   */
   const node = this._userNode ? this._userNode : document.body;
@@ -102,6 +102,8 @@ function predict(results) {
   // The keypoints in the current pose
   let points = results.poseLandmarks;
   if(points == null) return;
+
+  if(label == "waiting") makeTransition("Adjust Camera");
   
   // Set the location of the nose
   if(gameState == "Level Completed") {

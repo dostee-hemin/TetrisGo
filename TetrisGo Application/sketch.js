@@ -28,17 +28,16 @@ let framerateLogs = [];           // Stores a bunch of framerate values to displ
 /*-------------------- Setup -------------------*/
 // This is the starting point of the program. 
 // It manages setting up the scene, loading data, and other initial preparations.
-function setup() {
+ function setup() {
   createCanvas(1260, 700);
 
   // Initialize the toggle switch positions
   switchPosition.x1 = width - width / 8 - 50;
   switchPosition.x2 = switchPosition.x1;
 
-  // Call the setup function for the tetris part of the application
+  // Call the setup function for all parts of the application
   setupTetrisPart();
-
-  // Call the setup function for the animation part of the application
+  setupPoseDetectionPart();
   setupAnimationPart();
 }
 
@@ -124,7 +123,8 @@ function mainMenu() {
   stroke(0);
 
   if(label == "waiting") prompt = "  Loading.... ";
-  else prompt = "Press 'Enter'";
+  else if(label == 'enter') prompt = "Press 'Enter'";
+  else prompt = "";
 
   // Loop through all the characters in the prompt string
   for (var i = 0; i < promptOffsets.length; i++) {
@@ -392,7 +392,7 @@ function gameScene() {
 
   if (countdownStart == 0) {
     countdownStart = millis();
-    playSound(countdownSound);
+    countdownSound.play();
   }
 
   // Update and display the countdown timer and leave the function
@@ -485,7 +485,7 @@ function tutorialScene() {
     countdownStart = millis();
     startSecond = 0;
     setupTetrisPart();
-    mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+    mappedPiecesTxt = loadStrings("./TetrisGo Application/assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
   }
 }
 

@@ -219,7 +219,7 @@ function moveSideways(dir, tetromino) {
 function endGame() {
   gameState = "Game Over";
   songs[chosenSong].music.stop();
-  playSound(gameoverSound);
+  gameoverSound.play();
 }
 
 function checkLines() {
@@ -254,8 +254,8 @@ function checkLines() {
 
   // Play the correct sound based on the number of lines cleared
   if(gameState != "Tutorial") {
-    if(numberOfClears == 4) playSound(tetrisSound);
-    else if(numberOfClears > 0) playSound(lineclearSound);
+    if(numberOfClears == 4) tetrisSound.play();
+    else if(numberOfClears > 0) lineclearSound.play();
   }
 
   // Based on the number of lines cleared, increase the score
@@ -970,7 +970,7 @@ function updateGameElements() {
     // If the player couldn't pose in time, drop a scrambled tetromino
     if (x < 0) {
       upcomingPieces.push(currentTetrominoType+7);
-      playSound(wrongSound);
+      wrongSound.play();
       mappedPieces.shift();
       posedInTime = false;
       acceptanceFade = 150;
@@ -979,7 +979,7 @@ function updateGameElements() {
     else if(x < acceptanceAmount) {
       if(allLabels.indexOf(label) == currentTetrominoType) {
         upcomingPieces.push(currentTetrominoType);
-        playSound(correctSound);
+        correctSound.play();
         mappedPieces.shift();
         posedInTime = true;
         acceptanceFade = 150;

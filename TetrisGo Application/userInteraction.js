@@ -4,7 +4,10 @@ function keyPressed() {
   switch (gameState) {
     case "Main Menu":
       // In the main menu, if the user presses the enter key, move on to adjusting the camera
-      if (keyCode == RETURN && label!="waiting") makeTransition("Adjust Camera");
+      if (keyCode == RETURN) {
+        label = "waiting";
+        camera.start();
+      }
       break;
     case "Game Scene":
     case "Game Over":
@@ -66,7 +69,7 @@ function mousePressed() {
 
           // At this point, the user is not doing the tutorial, so directly enter the game
           makeTransition("Game Scene");
-          mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+          mappedPiecesTxt = loadStrings("./TetrisGo Application/assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
         }
       }
 

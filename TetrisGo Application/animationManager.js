@@ -739,6 +739,44 @@ function showTransition() {
         // Change to the scene that we wanted to transition to
         isShrinking = true;
         gameState = destinationScene;
+
+        switch(destinationScene) {
+            case "Select Song":
+                loadSongsInfo();
+                break;
+            case "Game Scene":
+            case "Tutorial":
+                if (poseImages.length == 0) {
+                    countdownSound = loadSound("./TetrisGo Application/assets/Sounds/countdown.mp3");
+                    correctSound = loadSound("./TetrisGo Application/assets/Sounds/correct.mp3");
+                    wrongSound = loadSound("./TetrisGo Application/assets/Sounds/wrong.mp3");
+                    lineclearSound = loadSound("./TetrisGo Application/assets/Sounds/lineclear.mp3");
+                    tetrisSound = loadSound("./TetrisGo Application/assets/Sounds/tetris.mp3");
+                    gameoverSound = loadSound("./TetrisGo Application/assets/Sounds/game over.mp3");
+                    fireworkSound = loadSound("./TetrisGo Application/assets/Sounds/firework.mp3");
+                    winSound = loadSound("./TetrisGo Application/assets/Sounds/win.mp3");
+                
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/O.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/I.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/T.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/S.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/Z.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/L.png"));
+                    poseImages.push(loadImage("./TetrisGo Application/assets/Images/J.png"));
+                
+                    gameOverImage = loadImage("./TetrisGo Application/assets/Images/gameover.png");
+                
+                    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/3.png"));
+                    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/2.png"));
+                    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/1.png"));
+                    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/GO!.png"));
+                
+                    statsImages.push(loadImage("./TetrisGo Application/assets/Images/score.png"));
+                    statsImages.push(loadImage("./TetrisGo Application/assets/Images/lines.png"));
+                    statsImages.push(loadImage("./TetrisGo Application/assets/Images/prediction.png"));
+                }
+                break;
+        }
     } else if(currentTransitionPiece < 0) isTransitioning = false;
 
     // Loop through all the pieces in the list and update and display them
