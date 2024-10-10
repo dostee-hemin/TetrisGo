@@ -44,29 +44,29 @@ function preload() {
     lineclearSound = document.getElementById("lineclear");
     tetrisSound = document.getElementById("tetris");
     gameoverSound = document.getElementById("gameover");
-    fireworkSound = loadSound("assets/Sounds/firework.mp3");
+    fireworkSound = loadSound("./TetrisGo Application/assets/Sounds/firework.mp3");
     fireworkSound.playMode("sustain");
-    winSound = loadSound("assets/Sounds/win.mp3");
+    winSound = loadSound("./TetrisGo Application/assets/Sounds/win.mp3");
     
-    poseImages.push(loadImage("assets/Images/O.png"));
-    poseImages.push(loadImage("assets/Images/I.png"));
-    poseImages.push(loadImage("assets/Images/T.png"));
-    poseImages.push(loadImage("assets/Images/S.png"));
-    poseImages.push(loadImage("assets/Images/Z.png"));
-    poseImages.push(loadImage("assets/Images/L.png"));
-    poseImages.push(loadImage("assets/Images/J.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/O.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/I.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/T.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/S.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/Z.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/L.png"));
+    poseImages.push(loadImage("./TetrisGo Application/assets/Images/J.png"));
 
-    logoImage = loadImage("assets/Images/Logo.png");
-    gameOverImage = loadImage("assets/Images/gameover.png");
+    logoImage = loadImage("./TetrisGo Application/assets/Images/Logo.png");
+    gameOverImage = loadImage("./TetrisGo Application/assets/Images/gameover.png");
 
-    countdownImages.push(loadImage("assets/Images/3.png"));
-    countdownImages.push(loadImage("assets/Images/2.png"));
-    countdownImages.push(loadImage("assets/Images/1.png"));
-    countdownImages.push(loadImage("assets/Images/GO!.png"));
+    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/3.png"));
+    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/2.png"));
+    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/1.png"));
+    countdownImages.push(loadImage("./TetrisGo Application/assets/Images/GO!.png"));
 
-    statsImages.push(loadImage("assets/Images/score.png"));
-    statsImages.push(loadImage("assets/Images/lines.png"));
-    statsImages.push(loadImage("assets/Images/prediction.png"));
+    statsImages.push(loadImage("./TetrisGo Application/assets/Images/score.png"));
+    statsImages.push(loadImage("./TetrisGo Application/assets/Images/lines.png"));
+    statsImages.push(loadImage("./TetrisGo Application/assets/Images/prediction.png"));
 
     setupPoseDetectionPart();
     loadSongsInfo();
@@ -103,8 +103,8 @@ function loadSongsInfo() {
     // Loop through all songs and load their music and cover images
     for(var i=0; i<songs.length; i++) {
       songs[i].setAssets(
-        loadSound('assets/Songs/' + songs[i].name + ' Song.mp3'),
-        loadImage('assets/Cover Images/'+songs[i].name+' Cover.png'));
+        loadSound('./TetrisGo Application/assets/Songs/' + songs[i].name + ' Song.mp3'),
+        loadImage('./TetrisGo Application/assets/Cover Images/'+songs[i].name+' Cover.png'));
     }
 }
   
