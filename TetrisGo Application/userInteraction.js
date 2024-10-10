@@ -66,7 +66,7 @@ function mousePressed() {
 
           // At this point, the user is not doing the tutorial, so directly enter the game
           makeTransition("Game Scene");
-          mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+          mappedPiecesTxt = loadStrings("./TetrisGo Application/assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
         }
       }
 

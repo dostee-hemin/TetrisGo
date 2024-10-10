@@ -392,7 +392,7 @@ function gameScene() {
 
   if (countdownStart == 0) {
     countdownStart = millis();
-    playSound(countdownSound);
+    countdownSound.play();
   }
 
   // Update and display the countdown timer and leave the function
@@ -485,7 +485,7 @@ function tutorialScene() {
     countdownStart = millis();
     startSecond = 0;
     setupTetrisPart();
-    mappedPiecesTxt = loadStrings("assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
+    mappedPiecesTxt = loadStrings("./TetrisGo Application/assets/Mapped Pieces/" + songs[chosenSong].name + " Pieces.txt", setupMappedPieces);
   }
 }
 

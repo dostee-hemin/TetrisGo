@@ -37,15 +37,13 @@ let statsImages = [];               // Contains the title of the statistics that
 // This function will be run before the setup() of the program to load all the song files into the program
 function preload() {
     // I will be accessing the HTML audio elements and controlling their behavior via script rather than use p5.sound
-    themeSong = document.getElementById("themeSong");
-    countdownSound = document.getElementById("countdown");
-    correctSound = document.getElementById("correct");
-    wrongSound = document.getElementById("wrong");
-    lineclearSound = document.getElementById("lineclear");
-    tetrisSound = document.getElementById("tetris");
-    gameoverSound = document.getElementById("gameover");
+    countdownSound = loadSound("./TetrisGo Application/assets/Sounds/countdown.mp3");
+    correctSound = loadSound("./TetrisGo Application/assets/Sounds/correct.mp3");
+    wrongSound = loadSound("./TetrisGo Application/assets/Sounds/wrong.mp3");
+    lineclearSound = loadSound("./TetrisGo Application/assets/Sounds/lineclear.mp3");
+    tetrisSound = loadSound("./TetrisGo Application/assets/Sounds/tetris.mp3");
+    gameoverSound = loadSound("./TetrisGo Application/assets/Sounds/game over.mp3");
     fireworkSound = loadSound("./TetrisGo Application/assets/Sounds/firework.mp3");
-    fireworkSound.playMode("sustain");
     winSound = loadSound("./TetrisGo Application/assets/Sounds/win.mp3");
     
     poseImages.push(loadImage("./TetrisGo Application/assets/Images/O.png"));
