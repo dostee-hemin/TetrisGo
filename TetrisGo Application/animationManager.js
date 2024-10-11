@@ -77,7 +77,7 @@ function setupAnimationPart() {
     // Initialize the rain effect manager
     rainEffect = new RainEffect();
 
-    startCardX = width/2 - cardWidth*1.1;
+    startCardX = widthDiv2 - cardWidth*1.1;
     lerpCardX = startCardX;
 }
 
@@ -179,7 +179,7 @@ class Card {
     constructor(name, difficulty) {
         // Set the x and y points, as well as where the y should be
         this.x = 0;
-        this.y = height/2+50;
+        this.y = heightDiv2+50;
         this.targetY = this.y;
 
         // Set the name and difficulty to the values given
@@ -245,19 +245,19 @@ class Card {
     // Return's true if the mouse hovers over the card and is within the boundaries of the left and right move buttons
     isUnderMouse() {
         return mouseX > this.x-cardWidth/2 && mouseX < this.x+cardWidth/2 &&
-               mouseX > width/2-cardWidth*1.1*1.5 && mouseX < width/2+cardWidth*1.1*1.5 &&
-               mouseY > height/2-20-cardHeight*0.5 && mouseY < height/2+50+cardHeight*0.5;
+               mouseX > widthDiv2-cardWidth*1.1*1.5 && mouseX < widthDiv2+cardWidth*1.1*1.5 &&
+               mouseY > heightDiv2-20-cardHeight*0.5 && mouseY < heightDiv2+50+cardHeight*0.5;
     }
 
     // Returns true if the card is currently levitating
     isPressed() {
-        return this.targetY == height/2-20;
+        return this.targetY == heightDiv2-20;
     }
 
     // Function that makes the card rise and fall
     interactWithMouse() {
-        if(this.isUnderMouse()) this.targetY = height/2-20;
-        else this.targetY = height/2+50;
+        if(this.isUnderMouse()) this.targetY = heightDiv2-20;
+        else this.targetY = heightDiv2+50;
     }
 }
 
@@ -781,7 +781,7 @@ function showTransition() {
 
     // Loop through all the pieces in the list and update and display them
     for (var i = 0; i < transitionPieces.length; i++) {
-        var d = dist(transitionPieces[i].center.x,transitionPieces[i].center.y, width/2, height/2);
+        var d = dist(transitionPieces[i].center.x,transitionPieces[i].center.y, widthDiv2, heightDiv2);
         
         if(isShrinking) {
             if (d > currentTransitionPiece*transScl) transitionPieces[i].update();

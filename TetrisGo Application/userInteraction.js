@@ -36,17 +36,17 @@ function mousePressed() {
     case "Adjust Camera":
       // Toggle switches for showing the keypoints and arms
       if (mouseInRect(width - width / 8 - 100, width - width / 8 + 100, height / 3 + 25, height / 3 + 75)) showKeypoints = !showKeypoints;
-      if (mouseInRect(width - width / 8 - 100, width - width / 8 + 100, height / 2 + 75, height / 2 + 125)) showArms = !showArms;
+      if (mouseInRect(width - width / 8 - 100, width - width / 8 + 100, heightDiv2 + 75, heightDiv2 + 125)) showArms = !showArms;
       break;
     case "Select Song":
       // Moving the cards
       if (songs.length > 3) {
-        if (dist(mouseX, mouseY, 60, height / 2) < 30) {
+        if (dist(mouseX, mouseY, 60, heightDiv2) < 30) {
           startCardX += cardWidth * 1.1;
-        } else if (dist(mouseX, mouseY, width - 60, height / 2) < 30) {
+        } else if (dist(mouseX, mouseY, width - 60, heightDiv2) < 30) {
           startCardX -= cardWidth * 1.1;
         }
-        startCardX = constrain(startCardX, width / 2 - cardWidth * 1.1 * (songs.length - 2), width / 2 - cardWidth * 1.1);
+        startCardX = constrain(startCardX, widthDiv2 - cardWidth * 1.1 * (songs.length - 2), widthDiv2 - cardWidth * 1.1);
       }
 
       // Selecting a card
@@ -74,7 +74,7 @@ function mousePressed() {
       }
 
       // Toggle Switch
-      if (mouseInRect(width / 2 - 90, width / 2 + 90, height - 90, height - 10))
+      if (mouseInRect(widthDiv2 - 90, widthDiv2 + 90, height - 90, height - 10))
         isDoingTutorial = !isDoingTutorial;
       break;
   }

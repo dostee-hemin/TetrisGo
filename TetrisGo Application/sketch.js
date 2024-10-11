@@ -18,6 +18,9 @@ let showKeypoints = false;        // Determines whether or not we should show th
 let showArms = false;             // Determines whether or not we should show the arm segments of the predictions
 let switchPosition = { x1: 0, x2: 0 };  // Stores the x positions of the toggle switches
 let framerateLogs = [];           // Stores a bunch of framerate values to display as a graph
+let unitSize;                     // A unit of 10 pixels used for graphics sizing that is scaled up or down to be consistent across screen sizes
+let widthDiv2;                    // width of screen in pixels divided by two (stored for frequent use)
+let heightDiv2;                   // height of screen in pixels divided by two (stored for frequent use)
 
 
 
@@ -29,16 +32,26 @@ let framerateLogs = [];           // Stores a bunch of framerate values to displ
 // This is the starting point of the program. 
 // It manages setting up the scene, loading data, and other initial preparations.
  function setup() {
-  createCanvas(1260, 700);
+  createCanvas(100,100);
+  windowResized();
 
   // Initialize the toggle switch positions
-  switchPosition.x1 = width - width / 8 - 50;
+  switchPosition.x1 = width - width / 8 - unitSize*5;
   switchPosition.x2 = switchPosition.x1;
 
   // Call the setup function for all parts of the application
   setupTetrisPart();
   setupPoseDetectionPart();
   setupAnimationPart();
+}
+
+function windowResized() {
+  // Change the width of the screen
+  unitSize = windowWidth*0.00523
+  resizeCanvas(unitSize*191, unitSize*92);
+
+  widthDiv2 = width/2;
+  heightDiv2 = height/2;
 }
 
 
@@ -103,7 +116,7 @@ function mainMenu() {
 
   // Draw the logo with the proper scale and rotation
   push();
-  translate(width / 2 - 20, height / 2);
+  translate(widthDiv2 - 20, heightDiv2);
   rotate(logoSize * HALF_PI - HALF_PI);
   scale(logoSize);
   tint(0);
@@ -115,7 +128,7 @@ function mainMenu() {
 
   // Draw the prompt that asks the user to press enter
   push();
-  translate(width / 2, height - 50);
+  translate(widthDiv2, height - 50);
   scale(promptSize);
   textAlign(CENTER);
   strokeWeight(5);
@@ -163,7 +176,7 @@ function adjustCamera() {
   // Draw the webcam feed in the middle of the screen
   imageMode(CENTER);
   push();
-  translate(width / 2, height / 2);
+  translate(widthDiv2, heightDiv2);
   scale(-1, 1);
   image(video, 0, 0);
   pop();
@@ -171,7 +184,7 @@ function adjustCamera() {
   stroke(0);
   strokeWeight(10);
   noFill();
-  rect(width / 2, height / 2, video.width, video.height);
+  rect(widthDiv2, heightDiv2, video.width, video.height);
 
   if (showArms) {
     stroke(255, 0, 0);
@@ -213,29 +226,29 @@ function adjustCamera() {
   stroke(0);
   rectMode(CENTER);
   strokeWeight(2);
-  rect(width / 2, 88, 700, 6);
+  rect(widthDiv2, 88, 700, 6);
   strokeWeight(5);
   textSize(60);
   textAlign(CENTER, BASELINE);
-  text("Adjust Camera Position", width / 2, 75);
+  text("Adjust Camera Position", widthDiv2, 75);
 
   // Stats titles
   textSize(30);
   strokeWeight(2);
   text("Model Prediction:", width / 8, height / 3);
-  text("Frame rate:", width / 8, height / 2 + 50);
+  text("Frame rate:", width / 8, heightDiv2 + 50);
   text("Show Keypoints:", width - width / 8, height / 3);
-  text("Show Arms:", width - width / 8, height / 2 + 50);
+  text("Show Arms:", width - width / 8, heightDiv2 + 50);
 
   // Yes and no boxes
   stroke(0);
   strokeWeight(4);
   fill(0, 150, 0);
   rect(width - width / 8 - 50, height / 3 + 50, 100, 50);
-  rect(width - width / 8 - 50, height / 2 + 100, 100, 50);
+  rect(width - width / 8 - 50, heightDiv2 + 100, 100, 50);
   fill(150, 0, 0);
   rect(width - width / 8 + 50, height / 3 + 50, 100, 50);
-  rect(width - width / 8 + 50, height / 2 + 100, 100, 50);
+  rect(width - width / 8 + 50, heightDiv2 + 100, 100, 50);
 
   // Yes and no texts
   textAlign(CENTER, CENTER);
@@ -243,11 +256,11 @@ function adjustCamera() {
   fill(0, 255, 0);
   stroke(0, 200, 0);
   text("Yes", width - width / 8 - 50, height / 3 + 50);
-  text("Yes", width - width / 8 - 50, height / 2 + 100);
+  text("Yes", width - width / 8 - 50, heightDiv2 + 100);
   fill(255, 0, 0);
   stroke(200, 0, 0);
   text("No", width - width / 8 + 50, height / 3 + 50);
-  text("No", width - width / 8 + 50, height / 2 + 100);
+  text("No", width - width / 8 + 50, heightDiv2 + 100);
 
   // Toggle switches
   fill(0, 200);
@@ -259,7 +272,7 @@ function adjustCamera() {
   x = width - width / 8 - 50;
   if (showArms) x += 100;
   switchPosition.x2 = lerp(switchPosition.x2, x, 0.2);
-  rect(switchPosition.x2, height / 2 + 100, 100, 50);
+  rect(switchPosition.x2, heightDiv2 + 100, 100, 50);
 
   // Get the index in the allLabels array that the current prediction is located
   let indexOfLabel = allLabels.indexOf(label);
@@ -278,7 +291,7 @@ function adjustCamera() {
 
   // Display the current framerate
   fill(0);
-  text(round(frameRate()), width / 8, height / 2 + 110);
+  text(round(frameRate()), width / 8, heightDiv2 + 110);
 
   // Create the graph from the list of framerate logs
   let framerateAvg = 0;
@@ -286,34 +299,34 @@ function adjustCamera() {
   stroke(0, 200, 0);
   strokeWeight(1);
   beginShape();
-  vertex(width / 8 - 100, height / 2 + 200)
+  vertex(width / 8 - 100, heightDiv2 + 200)
   for (var i = 0; i < framerateLogs.length; i++) {
-    vertex(width / 8 - 100 + i, height / 2 + 200 - framerateLogs[i] / 70 * 50);
+    vertex(width / 8 - 100 + i, heightDiv2 + 200 - framerateLogs[i] / 70 * 50);
     framerateAvg += framerateLogs[i];
   }
   framerateAvg /= framerateLogs.length;
-  vertex(width / 8 - 101 + framerateLogs.length, height / 2 + 200)
+  vertex(width / 8 - 101 + framerateLogs.length, heightDiv2 + 200)
   endShape(CLOSE);
 
   stroke(100);
   strokeWeight(2);
-  line(width / 8 - 100, height / 2 + 200 - framerateAvg / 70 * 50, width / 8 - 100+framerateLogs.length, height / 2 + 200 - framerateAvg / 70 * 50);
+  line(width / 8 - 100, heightDiv2 + 200 - framerateAvg / 70 * 50, width / 8 - 100+framerateLogs.length, heightDiv2 + 200 - framerateAvg / 70 * 50);
   fill(0);
   noStroke();
   textSize(20);
   textAlign(CENTER);
-  text(round(framerateAvg), width / 8 - 100-30, height / 2 + 200 - framerateAvg / 70 * 50)
+  text(round(framerateAvg), width / 8 - 100-30, heightDiv2 + 200 - framerateAvg / 70 * 50)
 
   // Create the graph axis
   stroke(0);
   strokeWeight(3);
-  line(width / 8 - 100, height / 2 + 150, width / 8 - 100, height / 2 + 200);
-  line(width / 8 - 100, height / 2 + 200, width / 8 + 100, height / 2 + 200);
+  line(width / 8 - 100, heightDiv2 + 150, width / 8 - 100, heightDiv2 + 200);
+  line(width / 8 - 100, heightDiv2 + 200, width / 8 + 100, heightDiv2 + 200);
 
   // Display instructions for confirming the camera position
   textSize(40);
   fill(200);
-  text("Press 'Enter' to Confirm", width / 2, height - 50);
+  text("Press 'Enter' to Confirm", widthDiv2, height - 50);
 }
 
 
@@ -327,7 +340,7 @@ function selectSong() {
   stroke(0);
   strokeWeight(5);
   textSize(60);
-  text("Select Your Song", width / 2, 75);
+  text("Select Your Song", widthDiv2, 75);
 
 
   // Display and update the song cards
@@ -345,8 +358,8 @@ function selectSong() {
   }
   noStroke();
   fill(255);
-  rect(50, height / 2, 100, height);
-  rect(width - 50, height / 2, 100, height);
+  rect(50, heightDiv2, 100, height);
+  rect(width - 50, heightDiv2, 100, height);
 
   // Move the cards to the correct position
   lerpCardX = lerp(lerpCardX, startCardX, 0.1);
@@ -361,18 +374,18 @@ function selectSong() {
     stroke(100);
   }
   rectMode(CENTER);
-  rect(width / 2, height - 50, 180, 60, 5)
+  rect(widthDiv2, height - 50, 180, 60, 5)
   fill(200);
   stroke(0);
   strokeWeight(3);
   textAlign(CENTER,CENTER);
   textSize(50);
-  text("Tutorial", width / 2, height - 50);
+  text("Tutorial", widthDiv2, height - 50);
 
   // Move left and right buttons
   strokeWeight(5);
-  triangle(30, height / 2, 90, height / 2 - 30, 90, height / 2 + 30);
-  triangle(width - 30, height / 2, width - 90, height / 2 - 30, width - 90, height / 2 + 30);
+  triangle(30, heightDiv2, 90, heightDiv2 - 30, 90, heightDiv2 + 30);
+  triangle(width - 30, heightDiv2, width - 90, heightDiv2 - 30, width - 90, heightDiv2 + 30);
 }
 
 
@@ -403,7 +416,7 @@ function gameScene() {
     var sizeOff = -64 * pow(currentSecond % 1 - 0.5, 6) + 1;
     imageMode(CENTER);
     push();
-    translate(width / 2, height / 2 - yOff * 150);
+    translate(widthDiv2, heightDiv2 - yOff * 150);
     scale(sizeOff);
     image(countdownImages[floor(currentSecond)], 0, 0);
     pop();
@@ -495,13 +508,13 @@ function gameOver() {
 
   // Game over text
   imageMode(CENTER);
-  if((floor(float(frameCount)/30))%2==0) image(gameOverImage, width/2, height/2, width*0.8, 150);
+  if((floor(float(frameCount)/30))%2==0) image(gameOverImage, widthDiv2, heightDiv2, width*0.8, 150);
 
   // Restart
   textSize(60);
   fill(255);
   textAlign(CENTER);
-  text("Press 'r' to restart", width / 2, height-50);
+  text("Press 'r' to restart", widthDiv2, height-50);
 }
 
 function levelCompleted() {
@@ -516,9 +529,9 @@ function levelCompleted() {
   textSize(100);
   textAlign(CENTER);
   noStroke();
-  text("Level Completed!", width / 2 + 3, titleY + 3);
+  text("Level Completed!", widthDiv2 + 3, titleY + 3);
   fill(255)
-  text("Level Completed!", width / 2, titleY);
+  text("Level Completed!", widthDiv2, titleY);
   // Move the title text to the correct y position
   titleY = lerp(titleY, sin(float(frameCount) / 15) * 8 + 100, 0.1);
 
@@ -537,7 +550,7 @@ function levelCompleted() {
 
   // Display the score and linecount values
   push();
-  translate(width/2,height/2);
+  translate(widthDiv2,heightDiv2);
   scale(map(min(titleY,90), -200, 90, 0, 1));
   imageMode(CENTER);
   image(statsImages[0], width*-3/8, -50, 210,70);
@@ -551,7 +564,7 @@ function levelCompleted() {
 
   // Display the current camera feed
   push();
-  translate(width / 2, camY);
+  translate(widthDiv2, camY);
   scale(-1, 1);
   imageMode(CENTER);
   image(video, 0, 0);
@@ -560,10 +573,10 @@ function levelCompleted() {
   stroke(200);
   strokeWeight(8);
   rectMode(CENTER);
-  rect(width/2, camY, video.width, video.height, 5);
+  rect(widthDiv2, camY, video.width, video.height, 5);
 
   // Move the camera feed's y position to the correct location
-  camY = lerp(camY, height / 2 + 50, 0.1);
+  camY = lerp(camY, heightDiv2 + 50, 0.1);
 
   // Calculate the values for drawing the face piece
   faceSize = dist(nose.x, nose.y, eye.x, eye.y);
